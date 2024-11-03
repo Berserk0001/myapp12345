@@ -6,6 +6,7 @@
  */
 import _ from "lodash";
 import got from "got";
+import randomMobileUA from "./ua.js"
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
 import compress from "./compress.js";
@@ -32,7 +33,7 @@ export default async function proxy(req, res) {
     const gotoptions = {
     headers: {
       ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
-      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.3",
+      "user-agent": randomMobileUA(),
     },
     maxRedirects: 4,
    followRedirect: false, // We handle redirects manually
