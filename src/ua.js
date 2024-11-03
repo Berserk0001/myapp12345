@@ -187,19 +187,19 @@ const randomFromLength = (arr) =>{
   return Math.floor(Math.random() * arr.length);
 }
 
-export default const all = () => {
+export const all = () => {
   const all = [...userAgent.desktop,...userAgent.mobile];
   return all;
 }
 
-export default const randomUA = () => {
+export const randomUA = () => {
   return allUA()[randomFromLength(allUA())]
 }
 
-export default const randomMobileUA = () => {
+export const randomMobileUA = () => {
   return userAgent.mobile[randomFromLength(userAgent.mobile)]
 }
 
-export default const randomDesktopUA = () => {
+export const randomDesktopUA = () => {
   return userAgent.desktop[randomFromLength(userAgent.desktop)]
 }
