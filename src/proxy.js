@@ -6,7 +6,7 @@
  */
 import _ from "lodash";
 import got from "got";
-import {randomMobileUA} from "./ua.js"
+import { randomMobileUA } from "./ua.js"
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
 import compress from "./compress.js";
