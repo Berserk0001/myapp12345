@@ -48,8 +48,7 @@ export default function proxy(req, res) {
       timeout: {
         response: 6600 // ms
       },
-      decompress: true,
-  //  throwHttpErrors: false, 
+   throwHttpErrors: false, 
   };
     
     let origin = got.stream(url, options);
@@ -58,7 +57,7 @@ export default function proxy(req, res) {
 
     origin.on('response', (originResponse) => {
 
-      //validateResponse(originResponse)
+      validateResponse(originResponse)
       
       if (originResponse.statusCode >= 400 || (originResponse.statusCode >= 300 && originResponse.headers.location)) {
         // Redirect if status is 4xx or redirect location is present
