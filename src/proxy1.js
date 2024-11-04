@@ -94,11 +94,11 @@ export default async function proxy(req, res) {
     });
   } catch (err) {
     if (error instanceof RequestError) {
-      return redirect(req, res);
-      //console.log(error);
-    //  return res.status(503).end('request time out', 'ascii');
+     // return redirect(req, res);
+      console.log(error);
+      return res.status(503).end('request time out', 'ascii');
     }
-   // console.log("some error on " + req.path + "\n", error, '\n');
+    console.log("some error on " + req.path + "\n", error, '\n');
     return redirect(req, res);
   }
 }
