@@ -2,11 +2,13 @@
 "use strict";
 
 import express from 'express';
+import helmet from 'helmet';
 import params from './src/params.js';
-import proxy from './src/proxy3.js';
+import proxy from './src/proxy2.js';
 const PORT = process.env.PORT || 8080;
 const app = express();
-
+app.use(helmet());
+app.disable('x-powered-by');
 // Uncomment the next line if you want to trust the proxy
 // app.enable('trust proxy');
 

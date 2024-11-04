@@ -27,8 +27,8 @@ async function proxy(req, res) {
       headers: {
         ...pick(req.headers, ["cookie", "dnt", "referer"]),
         "user-agent": randomMobileUA(),
-        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
-        via: "1.1 bandwidth-hero",
+        //"x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
+       // via: "1.1 bandwidth-hero",
       },
       https: {
         rejectUnauthorized: false,
@@ -74,7 +74,7 @@ async function proxy(req, res) {
 
     //  console.log("[CLEANED] cf-headers cleaned " + req.path);
 
-      validateResponse(response);
+      validateResponse(response)
       copyHeaders(response, res);
 
       res.setHeader("content-encoding", "identity");

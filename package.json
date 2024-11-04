@@ -11,11 +11,12 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "tough-cookie": "5.0.0",
-    "got": "11.8.6",
     "express": "4.21.1",
+    "got": "11.8.6",
+    "helmet": "^8.0.0",
     "lodash": "4.17.21",
-    "sharp": "0.33.5"
+    "sharp": "0.33.5",
+    "tough-cookie": "5.0.0"
   },
   "engines": {
     "node": "20.x"

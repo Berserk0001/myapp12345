@@ -11,10 +11,10 @@ import redirect from "./redirect.js";
 import compress from "./compress.js";
 import copyHeaders from "./copyHeaders.js";
 import { CookieJar } from "tough-cookie";
-
+const cookieJar = new CookieJar();
 const { pick } = _;
 
-async function proxy(req, res) {
+function proxy(req, res) {
   
 
   try {
@@ -27,20 +27,19 @@ async function proxy(req, res) {
         rejectUnauthorized: false,
       },
       maxRedirects: 5,
-      decompress: true,
       cookieJar,
       timeout: {
         response: 6600 // ms
       }
   };
     
-    let origin = await got.stream(req.params.url, gotoptions);
+    let origin = got.stream(req.params.url, gotoptions);
 
     origin.on('response', (originResponse) => {
-      if (originResponse.statusCode >= 400 || (originResponse.statusCode >= 300 && originResponse.headers.location)) {
+     /* if (originResponse.statusCode >= 300 && originResponse.headers.location) {
         // Redirect if status is 4xx or redirect location is present
         return redirect(req, res);
-      }
+      }*/
 
       validateResponse(originResponse)
 
@@ -54,7 +53,7 @@ async function proxy(req, res) {
       req.params.originSize = originResponse.headers["content-length"] || "0";
 
       // Handle streaming response
-      //origin.on('error', () => req.socket.destroy());
+      origin.on('error', () => req.socket.destroy());
 
       if (shouldCompress(req)) {
         // Compress and pipe response if required
@@ -76,13 +75,13 @@ async function proxy(req, res) {
       console.log(error);
       return res.status(503).end('request time out', 'ascii');
     }
-    console.log("some error on " + req.path + "\n", error, '\n');
+    console.log("some error on ");
     return redirect(req, res);
   }
 }
 
   const validateResponse = (res) => {
-  if (res.statusCode >= 400 || !res.headers['content-type'].startsWith('image')) {
+  if ( res.statusCode >= 400 || !res.headers['content-type'].startsWith('image')) {
     throw Error(`content-type was ${res.headers['content-type']} expected content type "image/*" , status code ${res.statusCode}`)
   };
   }
