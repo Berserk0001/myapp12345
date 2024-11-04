@@ -16,8 +16,8 @@ const { pick } = _;
 
 const validateResponse = (res) => {
   if (res.statusCode >= 400 || !res.headers['content-type'].startsWith('image') || (res.statusCode >= 300 && res.headers.location)) {
-   // throw Error(`content-type was ${res.headers['content-type']} expected content type "image/*" , status code ${res.statusCode}`)
-    return redirect(req, res);
+    throw Error(`content-type was ${res.headers['content-type']} expected content type "image/*" , status code ${res.statusCode}`)
+  //  return redirect(req, res);
   };
 }
 
