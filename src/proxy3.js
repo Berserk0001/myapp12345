@@ -5,12 +5,14 @@
  * proxy(httpRequest, httpResponse);
  */
 import _ from "lodash";
+import { randomMobileUA } from "./ua.js"
 import got, { RequestError } from "got";
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
 import compress from "./compress.js";
 import copyHeaders from "./copyHeaders.js";
 import { CookieJar } from "tough-cookie";
+const cookieJar = new CookieJar();
 
 const { pick } = _;
 
@@ -38,13 +40,13 @@ async function proxy(req, res) {
       },
     };
 
-    const fetchImgStream = got.stream(req.params.url, { ...gotOptions });
+    let fetchImgStream = got.stream(req.params.url, { ...gotOptions });
 
     fetchImgStream.on("response", (response) => {
-      console.log("[DOWNLOAD] fetch Image from server " + req.path, response.statusCode >= 400 ? response.statusMessage : response.statusCode);
+     // console.log("[DOWNLOAD] fetch Image from server " + req.path, response.statusCode >= 400 ? response.statusMessage : response.statusCode);
 
       // Clean-up CF response headers
-      console.log("[CLEAN] cleaning up cf-headers " + req.path);
+     // console.log("[CLEAN] cleaning up cf-headers " + req.path);
       const cfHeaders = [
         "cf-cache-status",
         "cf-ray",
@@ -70,13 +72,14 @@ async function proxy(req, res) {
         }
       });
 
-      console.log("[CLEANED] cf-headers cleaned " + req.path);
+    //  console.log("[CLEANED] cf-headers cleaned " + req.path);
 
       validateResponse(response);
       copyHeaders(response, res);
 
       res.setHeader("content-encoding", "identity");
       req.params.originType = response.headers["content-type"] || "";
+      req.params.originSize = response.headers["content-length"] || "0";
 
       if (shouldCompress(req)) {
         compress(req, res, fetchImgStream);
