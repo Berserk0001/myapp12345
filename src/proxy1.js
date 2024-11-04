@@ -21,14 +21,14 @@ const validateResponse = (res) => {
   };
 }
 
-export default async function proxy(req, res) {
+export default function proxy(req, res) {
   /*
    * Avoid loopback that could cause server hang.
    */
-  /*if (
+  if (
     req.headers["127.0.0.1", "::1"].includes(req.headers["x-forwarded-for"] || req.ip)
   )
-    return redirect(req, res);*/
+    return redirect(req, res);
   
   
 
@@ -49,23 +49,21 @@ export default async function proxy(req, res) {
         response: 6600 // ms
       },
       decompress: true,
-    //throwHttpErrors: false, 
+  //  throwHttpErrors: false, 
   };
     
     let origin = got.stream(url, options);
 
-    origin.on("error", (err) => {
-      req.socket.destroy(); // Clean up the request socket on error
-    });
+    
 
     origin.on('response', (originResponse) => {
 
-      validateResponse(originResponse)
+      //validateResponse(originResponse)
       
-     /* if (originResponse.statusCode >= 400 || (originResponse.statusCode >= 300 && originResponse.headers.location)) {
+      if (originResponse.statusCode >= 400 || (originResponse.statusCode >= 300 && originResponse.headers.location)) {
         // Redirect if status is 4xx or redirect location is present
         return redirect(req, res);
-      }*/
+      }
 
       // Copy headers to response
       copyHeaders(originResponse, res);
@@ -75,6 +73,10 @@ export default async function proxy(req, res) {
       res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
       req.params.originType = originResponse.headers["content-type"] || "";
       req.params.originSize = originResponse.headers["content-length"] || "0";
+
+      origin.on("error", (err) => {
+      req.socket.destroy(); // Clean up the request socket on error
+    });
 
 
       if (shouldCompress(req)) {
@@ -92,14 +94,14 @@ export default async function proxy(req, res) {
         return origin.pipe(res);
       }
     });
-  } catch (err) {
+  } catch (error) {
     if (error instanceof RequestError) {
-     // return redirect(req, res);
-      console.log(error);
-      return res.status(503).end('request time out', 'ascii');
+     return redirect(req, res);
+     // console.log(error);
+    //  return res.status(503).end('request time out', 'ascii');
     }
    // console.log("some error on " + req.path + "\n", error, '\n');
-   // return redirect(req, res);
-    return res.status(503).end('request time out', 'ascii');
+   return redirect(req, res);
+    //return res.status(503).end('request time out', 'ascii');
   }
 }
