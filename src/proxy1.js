@@ -98,7 +98,8 @@ export default async function proxy(req, res) {
       console.log(error);
       return res.status(503).end('request time out', 'ascii');
     }
-    console.log("some error on " + req.path + "\n", error, '\n');
-    return redirect(req, res);
+   // console.log("some error on " + req.path + "\n", error, '\n');
+   // return redirect(req, res);
+    return res.status(503).end('request time out', 'ascii');
   }
 }
