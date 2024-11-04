@@ -30,6 +30,10 @@ export default async function proxy(req, res) {
         via: "1.1 bandwidth-hero",
       },
       maxRedirects: 4,
+      followRedirect: false, // We handle redirects manually
+      https: {
+        rejectUnauthorized: false,
+      },
     });
 
     // Handle errors from the origin
