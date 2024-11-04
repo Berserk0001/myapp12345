@@ -12,7 +12,7 @@ import compress from "./compress.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-export default async function proxy(req, res) {
+ async function proxy(req, res) {
   /*
    * Avoid loopback that could cause server hang.
    */
@@ -22,7 +22,7 @@ export default async function proxy(req, res) {
   ) return redirect(req, res);
 
   try {
-    const origin = got.stream(req.params.url, {
+    let origin = got.stream(req.params.url, {
       headers: {
         ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
         "user-agent": "Bandwidth-Hero Compressor",
@@ -34,6 +34,7 @@ export default async function proxy(req, res) {
       https: {
         rejectUnauthorized: false,
       },
+      throwHttpErrors: false,
     });
 
     // Handle errors from the origin
@@ -86,3 +87,4 @@ export default async function proxy(req, res) {
     console.error(err);
   }
 }
+export default proxy;
