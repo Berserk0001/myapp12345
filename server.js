@@ -3,7 +3,7 @@
 
 import express from 'express';
 import params from './src/params.js';
-import proxy from './src/proxy2.js';
+import proxy from './src/proxy3.js';
 const PORT = process.env.PORT || 8080;
 const app = express();
 
