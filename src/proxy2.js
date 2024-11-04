@@ -71,10 +71,11 @@ function proxy(req, res) {
       }
     });
   } catch (error) {
-    if (error instanceof RequestError) {
+    if (error instanceof RequestError) 
+    /*{
       console.log(error);
       return res.status(503).end('request time out', 'ascii');
-    }
+    }*/
     console.log("some error on ");
     return redirect(req, res);
   }
