@@ -49,7 +49,7 @@ export default async function proxy(req, res) {
         response: 6600 // ms
       },
       decompress: true,
-    throwHttpErrors: false, 
+    //throwHttpErrors: false, 
   };
     
     let origin = got.stream(url, options);
