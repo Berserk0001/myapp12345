@@ -34,7 +34,7 @@ async function proxy(req, res) {
       }
   };
     
-    let origin = got.stream(req.params.url, gotoptions);
+    let origin = await got.stream(req.params.url, gotoptions);
 
     origin.on('response', (originResponse) => {
       if (originResponse.statusCode >= 400 || (originResponse.statusCode >= 300 && originResponse.headers.location)) {
