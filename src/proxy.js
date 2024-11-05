@@ -70,7 +70,7 @@ export default async function proxy(req, res) {
       req.params.originSize = originResponse.headers["content-length"] || "0";
 
       // Handle streaming response
-    //  origin.on('error', () => req.socket.destroy());
+     origin.on('error', () => req.socket.destroy());
 
       if (shouldCompress(req)) {
         // Compress and pipe response if required
