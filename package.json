@@ -1,6 +1,6 @@
 {
   "name": "node-app-version",
-  "main": "server1.js",
+  "main": "server.js",
   "type": "module",
   "private": true,
   "version": "1.0.1",
@@ -8,7 +8,7 @@
   "author": "JhonySingh",
   "license": "Mozilla Public License 2.0",
   "scripts": {
-    "start": "node server1.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "4.21.1",
