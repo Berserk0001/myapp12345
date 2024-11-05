@@ -53,13 +53,13 @@ export default async function proxy(req, res) {
     let origin = await got.stream(req.params.url, gotoptions);
 
     origin.on('response', (originResponse) => {
-      
+      origin.on('error', () => req.socket.destroy());
    // validateResponse(originResponse)
-      if (originResponse.statusCode >= 400)
+     /* if (originResponse.statusCode >= 400)
       {
        // console.log('ERROR');
-       // return redirect(req, res);
-        return res.status(400).send("Invalid URL");
+       return redirect(req, res);
+        
       }
 
   // handle redirects
@@ -67,9 +67,9 @@ export default async function proxy(req, res) {
   {
     return res.status(400).send("Invalid URL");
     //console.log('ERROR');
-  // return redirect(req, res);
+  return redirect(req, res);
   //  req.socket.destroy();
-  }
+  }*/
 
       // Copy headers to response
       copyHeaders(originResponse, res);
@@ -81,7 +81,7 @@ export default async function proxy(req, res) {
       req.params.originSize = originResponse.headers["content-length"] || "0";
 
       // Handle streaming response
-     origin.on('error', () => req.socket.destroy());
+    // origin.on('error', () => req.socket.destroy());
 
       if (shouldCompress(req)) {
         // Compress and pipe response if required
