@@ -22,10 +22,10 @@ export default async function proxy(req, res) {
   /*
    * Avoid loopback that could cause server hang.
    */
-/*  const clientIP = req.headers["x-forwarded-for"] || req.ip;
+  const clientIP = req.headers["x-forwarded-for"] || req.ip;
   if (["127.0.0.1", "::1"].includes(clientIP)) {
     return redirect(req, res);
-  }*/
+  }
   
 
   try {
@@ -58,14 +58,16 @@ export default async function proxy(req, res) {
       if (originResponse.statusCode >= 400)
       {
        // console.log('ERROR');
-        return redirect(req, res);
+       // return redirect(req, res);
+        return res.status(400).send("Invalid URL");
       }
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
   {
+    return res.status(400).send("Invalid URL");
     //console.log('ERROR');
-   return redirect(req, res);
+  // return redirect(req, res);
   //  req.socket.destroy();
   }
 
