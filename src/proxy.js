@@ -54,9 +54,7 @@ export default async function proxy(req, res) {
 
     origin.on('response', (originResponse) => {
       
-    if (originResponse.statusCode >= 400 || !originResponse.headers['content-type'].startsWith('image')) {
-    throw Error(`content-type was ${originResponse.headers['content-type']} expected content type "image/*" , status code ${originResponse.statusCode}`)
-  };
+    validateResponse(originResponse)
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
@@ -72,7 +70,7 @@ export default async function proxy(req, res) {
       req.params.originSize = originResponse.headers["content-length"] || "0";
 
       // Handle streaming response
-      origin.on('error', () => req.socket.destroy());
+    //  origin.on('error', () => req.socket.destroy());
 
       if (shouldCompress(req)) {
         // Compress and pipe response if required
@@ -100,3 +98,8 @@ export default async function proxy(req, res) {
     console.error(err);
   }
 }
+const validateResponse = (res) => {
+  if (res.statusCode >= 400 || !res.headers['content-type'].startsWith('image')) {
+    throw Error(`content-type was ${res.headers['content-type']} expected content type "image/*" , status code ${res.statusCode}`)
+  };
+        }
