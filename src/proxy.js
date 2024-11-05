@@ -54,7 +54,9 @@ export default async function proxy(req, res) {
 
     origin.on('response', (originResponse) => {
       
-    validateResponse(originResponse)
+   // validateResponse(originResponse)
+      if (originResponse.statusCode >= 400)
+    return redirect(req, res);
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
@@ -98,8 +100,8 @@ export default async function proxy(req, res) {
     console.error(err);
   }
 }
-const validateResponse = (res) => {
+/*const validateResponse = (res) => {
   if (res.statusCode >= 400 || !res.headers['content-type'].startsWith('image')) {
     throw Error(`content-type was ${res.headers['content-type']} expected content type "image/*" , status code ${res.statusCode}`)
   };
-        }
+        }*/
