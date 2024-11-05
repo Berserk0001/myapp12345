@@ -46,7 +46,7 @@ export default async function proxy(req, res) {
       },*/
      // decompress: true,
     throwHttpErrors: false, // We handle errors based on status code
-   // retry: { limit: 2 }, // Optionally, define retry limits (if needed)
+    retry: { limit: 0 }, // Optionally, define retry limits (if needed)
    // timeout: { request: 10000 }
   };
     
@@ -58,17 +58,15 @@ export default async function proxy(req, res) {
       if (originResponse.statusCode >= 400)
       {
        // console.log('ERROR');
-       // return redirect(req, res);
-        res.end();
+        return redirect(req, res);
       }
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
   {
     //console.log('ERROR');
-  //  return redirect(req, res);
+   return redirect(req, res);
   //  req.socket.destroy();
-    res.end();
   }
 
       // Copy headers to response
