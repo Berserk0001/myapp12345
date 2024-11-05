@@ -11,7 +11,7 @@ import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
 import compress from "./compress.js";
 import copyHeaders from "./copyHeaders.js";
-import { CookieJar } from "tough-cookie";
+//import { CookieJar } from "tough-cookie";
 
 const cookieJar = new CookieJar();
 
@@ -40,14 +40,14 @@ export default async function proxy(req, res) {
       https: {
         rejectUnauthorized: false,
       },
-      cookieJar,
-      timeout: {
+     // cookieJar,
+     /* timeout: {
         response: 6600, // ms
-      },
+      },*/
      // decompress: true,
     throwHttpErrors: false, // We handle errors based on status code
-    retry: { limit: 2 }, // Optionally, define retry limits (if needed)
-    timeout: { request: 10000 }
+   // retry: { limit: 2 }, // Optionally, define retry limits (if needed)
+   // timeout: { request: 10000 }
   };
     
     let origin = await got.stream(req.params.url, gotoptions);
