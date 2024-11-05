@@ -46,8 +46,8 @@ export default async function proxy(req, res) {
       },
      // decompress: true,
     throwHttpErrors: false, // We handle errors based on status code
- //   retry: { limit: 2 }, // Optionally, define retry limits (if needed)
-//    timeout: { request: 10000 }
+    retry: { limit: 2 }, // Optionally, define retry limits (if needed)
+    timeout: { request: 10000 }
   };
     
     let origin = await got.stream(req.params.url, gotoptions);
