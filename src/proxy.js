@@ -45,7 +45,7 @@ export default async function proxy(req, res) {
         response: 6600, // ms
       },
      // decompress: true,
-  //  throwHttpErrors: false, // We handle errors based on status code
+    throwHttpErrors: false, // We handle errors based on status code
  //   retry: { limit: 2 }, // Optionally, define retry limits (if needed)
 //    timeout: { request: 10000 }
   };
