@@ -58,16 +58,17 @@ export default async function proxy(req, res) {
       if (originResponse.statusCode >= 400)
       {
        // console.log('ERROR');
-        return redirect(req, res);
-        req.socket.destroy();
+       // return redirect(req, res);
+        res.end();
       }
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
   {
     //console.log('ERROR');
-    return redirect(req, res);
-    req.socket.destroy();
+  //  return redirect(req, res);
+  //  req.socket.destroy();
+    res.end();
   }
 
       // Copy headers to response
