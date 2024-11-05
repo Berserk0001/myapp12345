@@ -54,8 +54,9 @@ export default async function proxy(req, res) {
 
     origin.on('response', (originResponse) => {
       
-    if (originResponse.statusCode >= 400)
-    return redirect(req, res);
+    if (originResponse.statusCode >= 400 || !originResponse.headers['content-type'].startsWith('image')) {
+    throw Error(`content-type was ${originResponse.headers['content-type']} expected content type "image/*" , status code ${originResponse.statusCode}`)
+  };
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
