@@ -56,11 +56,17 @@ export default async function proxy(req, res) {
       
    // validateResponse(originResponse)
       if (originResponse.statusCode >= 400)
-    return redirect(req, res);
+      {
+        console.log('ERROR');
+        return redirect(req, res);
+      }
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
+  {
+    console.log('ERROR');
     return redirect(req, res);
+  }
 
       // Copy headers to response
       copyHeaders(originResponse, res);
@@ -94,10 +100,11 @@ export default async function proxy(req, res) {
     if (err.code === "ERR_INVALID_URL") {
       return res.status(400).send("Invalid URL");
     }
+    console.error(err);
 
     // Redirect on other errors
     redirect(req, res);
-    console.error(err);
+    
   }
 }
 /*const validateResponse = (res) => {
