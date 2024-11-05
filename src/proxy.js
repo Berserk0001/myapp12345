@@ -57,14 +57,14 @@ export default async function proxy(req, res) {
    // validateResponse(originResponse)
       if (originResponse.statusCode >= 400)
       {
-        console.log('ERROR');
+       // console.log('ERROR');
         return redirect(req, res);
       }
 
   // handle redirects
   if (originResponse.statusCode >= 300 && originResponse.headers.location)
   {
-    console.log('ERROR');
+    //console.log('ERROR');
     return redirect(req, res);
   }
 
