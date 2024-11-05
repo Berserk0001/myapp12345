@@ -35,7 +35,7 @@ export default async function proxy(req, res) {
       ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
       "user-agent": randomMobileUA(),
     },
-    maxRedirects: 4,
+    maxRedirects: 0,
    followRedirect: false, // We handle redirects manually
       https: {
         rejectUnauthorized: false,
