@@ -13,7 +13,7 @@ import compress from "./compress.js";
 import copyHeaders from "./copyHeaders.js";
 //import { CookieJar } from "tough-cookie";
 
-const cookieJar = new CookieJar();
+///const cookieJar = new CookieJar();
 
 const { pick } = _;
 
