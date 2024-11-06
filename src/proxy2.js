@@ -26,15 +26,15 @@ async function proxy(req, res) {
       },
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false, // Do not throw errors for non-2xx responses
-      timeout: 5000, // Timeout for the request (in ms)
+     // timeout: 5000, // Timeout for the request (in ms)
     });
 
     // Handle stream errors by attaching the error handler upfront
-    responseStream.on('error', (err) => {
+  /*  responseStream.on('error', (err) => {
     //  console.error('Stream error:', err);
      // redirect(req, res); // Redirect the client on error
       responseStream.destroy(); // Clean up the stream
-    });
+    });*/
 
     // Handle the response before streaming
     responseStream.once('response', (httpResponse) => {
