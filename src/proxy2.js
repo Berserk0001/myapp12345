@@ -26,7 +26,6 @@ async function proxy(req, res) {
       },
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false, // Do not throw errors for non-2xx responses
-     // timeout: 5000, // Timeout for the request (in ms)
     });
 
     // Handle stream errors by attaching the error handler upfront
@@ -37,7 +36,6 @@ async function proxy(req, res) {
       if (httpResponse.statusCode !== 200) {
         // If the response status is not 200, redirect the client
         redirect(req, res);
-       // responseStream.destroy(); // Destroy the stream after redirect
         return;
       }
 
@@ -66,11 +64,7 @@ async function proxy(req, res) {
     console.error('Proxy error:', err.message || err);
 
     // Redirect if an error occurs in the try-catch
-    redirect(req, res);
-
-   /* if (responseStream) {
-      responseStream.destroy(); // Destroy the response stream if it was initialized
-    }*/
+   return redirect(req, res);
   }
 }
 
