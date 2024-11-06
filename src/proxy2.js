@@ -30,11 +30,11 @@ async function proxy(req, res) {
     });
 
     // Handle stream errors by attaching the error handler upfront
-  /*  responseStream.on('error', (err) => {
+    responseStream.on('error', (err) => {
     //  console.error('Stream error:', err);
      // redirect(req, res); // Redirect the client on error
       responseStream.destroy(); // Clean up the stream
-    });*/
+    });
 
     // Handle the response before streaming
     responseStream.once('response', (httpResponse) => {
