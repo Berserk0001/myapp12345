@@ -6,7 +6,7 @@
 import sharp from 'sharp';
 import redirect from './redirect.js';
 sharp.cache(false);
-//sharp.concurrency(1);
+sharp.concurrency(1);
 const sharpStream = () => sharp({ unlimited: true });
 
  function compress(req, res, input) {
