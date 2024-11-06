@@ -21,7 +21,7 @@ async function proxy(req, res) {
       headers: {
         ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
         "user-agent": "Bandwidth-Hero Compressor",
-        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
+        "x-forwarded-for": req.socket.localAddress,
         via: "1.1 bandwidth-hero",
       },
       maxRedirects: 4, // Handles redirections
