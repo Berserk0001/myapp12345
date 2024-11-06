@@ -18,7 +18,7 @@ async function proxy(req, res) {
 
   try {
     // Fetch the image as a stream using `got.stream()`
-    let response = await got.stream(req.params.url, {
+    let response = await got(req.params.url, {
       headers: {
         ...pick(req.headers, ['cookie', 'dnt', 'referer', 'range']),
         'user-agent': 'Bandwidth-Hero Compressor',
