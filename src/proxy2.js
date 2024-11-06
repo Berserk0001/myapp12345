@@ -16,15 +16,16 @@ async function proxy(req, res) {
 
   try {
     // Fetch the image as a stream using `got`
-   let responseStream = got.stream(req.params.url, {
+   let responseStream = await got.stream(req.params.url, {
       headers: {
         ...pick(req.headers, ["dnt"]),
         "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
         "x-forwarded-for": req.socket.localAddress,
         via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
       },
+     decompress: true,
       maxRedirects: 4, // Handles redirections
-      throwHttpErrors: false, // Do not throw errors for non-2xx responses
+      throwHttpErrors: false // Do not throw errors for non-2xx responses
     // timeout: 5000, // Timeout for the request (in ms)
     });
 
