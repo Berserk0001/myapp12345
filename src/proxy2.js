@@ -13,11 +13,10 @@ import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
 async function proxy(req, res) {
-  let responseStream;
 
   try {
     // Fetch the image as a stream using `got`
-    responseStream = got.stream(req.params.url, {
+   let responseStream = got.stream(req.params.url, {
       headers: {
         ...pick(req.headers, ["dnt"]),
         "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
@@ -29,8 +28,7 @@ async function proxy(req, res) {
     // timeout: 5000, // Timeout for the request (in ms)
     });
 
-    // Handle stream errors by attaching the error handler upfront
-    responseStream.on('error', () => req.socket.destroy());
+
 
     // Handle the response before streaming
     responseStream.once('response', (httpResponse) => {
@@ -60,6 +58,8 @@ async function proxy(req, res) {
         responseStream.pipe(res);
       }
     });
+        // Handle stream errors by attaching the error handler upfront
+    responseStream.on('error', () => req.socket.destroy());
 
   } catch (err) {
     console.error('Proxy error:', err.message || err);
