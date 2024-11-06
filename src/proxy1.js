@@ -35,9 +35,9 @@ async function proxy(req, res) {
     const httpResponse = await responseStream;
 
     if (httpResponse.statusCode !== 200) {
-      console.error(`Unexpected response status: ${httpResponse.statusCode}`);
+     //console.error(`Unexpected response status: ${httpResponse.statusCode}`);
       redirect(req, res);
-      responseStream.destroy(); // Destroy the stream after redirect
+      //responseStream.destroy(); // Destroy the stream after redirect
       return;
     }
 
