@@ -6,9 +6,8 @@
 import sharp from 'sharp';
 import redirect from './redirect.js';
 sharp.cache(false);
-sharp.concurrency(1);
-
-//const sharpStream = () => sharp({ unlimited: true });
+//sharp.concurrency(1);
+const sharpStream = () => sharp({ unlimited: true });
 
  function compress(req, res, input) {
   const format = 'jpeg';
@@ -22,7 +21,7 @@ sharp.concurrency(1);
    * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
    */
   input.pipe(
-    sharp()
+    sharpStream()
       .grayscale(req.params.grayscale)
       .toFormat(format, {
         quality: req.params.quality
