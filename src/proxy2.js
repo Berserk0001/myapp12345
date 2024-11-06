@@ -10,40 +10,38 @@ import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
 import compress from "./compress.js";
 import copyHeaders from "./copyHeaders.js";
-import { CookieJar } from "tough-cookie";
-const cookieJar = new CookieJar();
 const { pick } = _;
 
-
-
 async function proxy(req, res) {
-  
-
   let responseStream;
 
   try {
     // Fetch the image as a stream using `got`
-    const response = await got.stream(req.params.url, {
+    responseStream = got.stream(req.params.url, {
       headers: {
         ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
         "user-agent": "Bandwidth-Hero Compressor",
         "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
         via: "1.1 bandwidth-hero",
       },
-    //  method: 'GET',
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false, // Do not throw errors for non-2xx responses
+      timeout: 5000, // Timeout for the request (in ms)
     });
 
-    // Assign the response stream for potential destruction later
-    responseStream = response;
+    // Handle stream errors by attaching the error handler upfront
+    responseStream.on('error', (err) => {
+    //  console.error('Stream error:', err);
+     // redirect(req, res); // Redirect the client on error
+      responseStream.destroy(); // Clean up the stream
+    });
 
-    // Check the status code manually since throwHttpErrors is set to false
-    responseStream.on('response', (httpResponse) => {
+    // Handle the response before streaming
+    responseStream.once('response', (httpResponse) => {
       if (httpResponse.statusCode !== 200) {
-       // console.error(`Unexpected response status: ${httpResponse.statusCode}`);
+        // If the response status is not 200, redirect the client
         redirect(req, res);
-        //responseStream.destroy(); // Destroy the stream after redirect
+       // responseStream.destroy(); // Destroy the stream after redirect
         return;
       }
 
@@ -58,24 +56,15 @@ async function proxy(req, res) {
       if (shouldCompress(req)) {
         compress(req, res, responseStream); // Send stream to compression
       } else {
-        // Bypass compression
+        // Bypass compression and pipe the response directly
         res.setHeader("x-proxy-bypass", 1);
-
         // Set specific headers
         for (const headerName of ["accept-ranges", "content-type", "content-length", "content-range"]) {
           if (headerName in httpResponse.headers) res.setHeader(headerName, httpResponse.headers[headerName]);
         }
-
         responseStream.pipe(res);
       }
     });
-
-    // Stream error handling: redirect first, then destroy the stream if errors occur
- /*   responseStream.on('error', (err) => {
-      console.error('Stream error:', err);
-      redirect(req, res); // Redirect first
-      responseStream.destroy(); // Destroy the stream after redirect
-    });*/
 
   } catch (err) {
     console.error('Proxy error:', err.message || err);
