@@ -12,79 +12,61 @@ import compress from "./compress.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
- async function proxy(req, res) {
-  /*
-   * Avoid loopback that could cause server hang.
-   */
-  if (
-    req.headers["via"] === "1.1 bandwidth-hero" &&
-    ["127.0.0.1", "::1"].includes(req.headers["x-forwarded-for"] || req.ip)
-  ) return redirect(req, res);
+
+async function proxy(req, res) {
+
 
   try {
-    let origin = got.stream(req.params.url, {
+    // Fetch the image as a stream using `got.stream()`
+    let response = got.stream(req.params.url, {
       headers: {
-        ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
-        "user-agent": "Bandwidth-Hero Compressor",
-        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
-        via: "1.1 bandwidth-hero",
+        ...pick(req.headers, ['cookie', 'dnt', 'referer', 'range']),
+        'user-agent': 'Bandwidth-Hero Compressor',
+        'x-forwarded-for': req.headers['x-forwarded-for'] || req.ip,
+        via: '1.1 bandwidth-hero',
       },
-      maxRedirects: 4,
-      followRedirect: false, // We handle redirects manually
-      https: {
-        rejectUnauthorized: false,
-      },
-      throwHttpErrors: false,
+      method: 'GET',
+      maxRedirects: 4, // Handles redirections
+      throwHttpErrors: false, // Do not throw errors for non-2xx responses
     });
 
-    // Handle errors from the origin
-    origin.on('error', (err) => {
-      req.socket.destroy(); // Destroy the request socket on error
-      //redirect(req, res); // Redirect on error
-      //console.error(err);
-    });
+    // Check if the response is successful by inspecting the status code
+    if (response.statusCode !== 200) {
+      //console.error(`Unexpected response status: ${response.statusCode}`);
+      redirect(req, res);
+     // response.destroy(); // Destroy the stream after redirect
+      return;
+    }
 
-    // Handle the response from the origin
-    origin.on('response', (response) => {
-      if (response.statusCode >= 400) {
-        return redirect(req, res);
+    // Copy headers and set necessary response headers
+    copyHeaders(response, res);
+    res.setHeader('content-encoding', 'identity');
+
+    req.params.originType = response.headers['content-type'] || '';
+    req.params.originSize = parseInt(response.headers['content-length'], 10) || 0;
+
+    // Check if the response should be compressed
+    if (shouldCompress(req)) {
+      compress(req, res, response.body); // Send the response stream to compression
+    } else {
+      // Bypass compression
+      res.setHeader('x-proxy-bypass', 1);
+
+      // Set specific headers
+      for (const headerName of ['accept-ranges', 'content-type', 'content-length', 'content-range']) {
+        if (headerName in response.headers) res.setHeader(headerName, response.headers[headerName]);
       }
 
-      // Handle redirects
-      if (response.statusCode >= 300 && response.headers.location) {
-        return redirect(req, res);
-      }
-
-      copyHeaders(response, res);
-      res.setHeader("content-encoding", "identity");
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-      res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
-      req.params.originType = response.headers["content-type"] || "";
-      req.params.originSize = response.headers["content-length"] || "0";
-
-      // Handle streaming and compression
-      if (shouldCompress(req)) {
-        return compress(req, res, origin);
-      } else {
-        res.setHeader("x-proxy-bypass", 1);
-
-        for (const headerName of ["accept-ranges", "content-type", "content-length", "content-range"]) {
-          if (headerName in response.headers) {
-            res.setHeader(headerName, response.headers[headerName]);
-          }
-        }
-
-        return origin.pipe(res);
-      }
-    });
+      // Pipe the response stream directly to the response object
+      response.body.pipe(res);
+    }
 
   } catch (err) {
-    if (err.code === "ERR_INVALID_URL") {
-      return res.status(400).send("Invalid URL");
-    }
+    console.error('Proxy error:', err.message || err);
+
+    // Redirect if an error occurs in the try-catch
     redirect(req, res);
-    console.error(err);
   }
 }
+
 export default proxy;
