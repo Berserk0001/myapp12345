@@ -13,4 +13,4 @@ function params(req, res, next) {
   next()
 }
 
-export default = params;
+export default params;
