@@ -25,7 +25,6 @@ async function proxy(req, res) {
         'x-forwarded-for': req.headers['x-forwarded-for'] || req.ip,
         via: '1.1 bandwidth-hero',
       },
-      method: 'GET',
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false, // Do not throw errors for non-2xx responses
     });
@@ -47,7 +46,7 @@ async function proxy(req, res) {
 
     // Check if the response should be compressed
     if (shouldCompress(req)) {
-      compress(req, res, response.body); // Send the response stream to compression
+      compress(req, res, response); // Send the response stream to compression
     } else {
       // Bypass compression
       res.setHeader('x-proxy-bypass', 1);
@@ -58,7 +57,7 @@ async function proxy(req, res) {
       }
 
       // Pipe the response stream directly to the response object
-      response.body.pipe(res);
+      response.pipe(res);
     }
 
   } catch (err) {
