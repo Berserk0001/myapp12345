@@ -10,7 +10,7 @@ sharp.concurrency(1);
 
 //const sharpStream = () => sharp({ unlimited: true });
 
-export default function compress(req, res, input) {
+ function compress(req, res, input) {
   const format = 'jpeg';
 
   /*
@@ -43,3 +43,4 @@ export default function compress(req, res, input) {
       })
   );
 }
+export default compress;
