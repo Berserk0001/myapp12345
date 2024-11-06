@@ -19,10 +19,10 @@ async function proxy(req, res) {
     // Fetch the image as a stream using `got`
     responseStream = got.stream(req.params.url, {
       headers: {
-        ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
-        "user-agent": "Bandwidth-Hero Compressor",
-        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
-        via: "1.1 bandwidth-hero",
+        ...pick(req.headers, ["dnt"]),
+        "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+        "x-forwarded-for": req.socket.localAddress,
+        via: "HTTP/1.1 GWA",
       },
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false, // Do not throw errors for non-2xx responses
