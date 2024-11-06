@@ -19,24 +19,25 @@ async function proxy(req, res) {
     // Fetch the image as a stream using `got`
     responseStream = got.stream(req.params.url, {
       headers: {
-        ...pick(req.headers, ["dnt"]),
-        "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-        "x-forwarded-for": req.socket.localAddress,
-        via: "HTTP/1.1 GWA",
+        ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
+        "user-agent": "Bandwidth-Hero Compressor",
+        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
+        via: "1.1 bandwidth-hero",
       },
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false, // Do not throw errors for non-2xx responses
+    // timeout: 5000, // Timeout for the request (in ms)
     });
 
     // Handle stream errors by attaching the error handler upfront
-    responseStream.on('error', _ => req.socket.destroy());
+    responseStream.on('error', () => req.socket.destroy());
 
     // Handle the response before streaming
     responseStream.once('response', (httpResponse) => {
       if (httpResponse.statusCode !== 200) {
         // If the response status is not 200, redirect the client
-        redirect(req, res);
-        return;
+       return redirect(req, res);
+       // responseStream.destroy(); // Destroy the stream after redirect
       }
 
       // Copy headers and set necessary response headers
@@ -64,7 +65,7 @@ async function proxy(req, res) {
     console.error('Proxy error:', err.message || err);
 
     // Redirect if an error occurs in the try-catch
-   return redirect(req, res);
+    return redirect(req, res);
   }
 }
 
