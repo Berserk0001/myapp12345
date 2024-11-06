@@ -32,7 +32,7 @@ async function proxy(req, res) {
     });
 
     // Set up immediate handling based on the initial status code and headers
-    const httpResponse = await responseStream;
+    let httpResponse = await responseStream;
 
     if (httpResponse.statusCode !== 200) {
      //console.error(`Unexpected response status: ${httpResponse.statusCode}`);
