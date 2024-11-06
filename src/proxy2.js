@@ -44,7 +44,7 @@ async function proxy(req, res) {
       res.setHeader('content-encoding', 'identity');
 
       req.params.originType = httpResponse.headers['content-type'] || '';
-      req.params.originSize = parseInt(httpResponse.headers['content-length'], 10) || 0;
+      req.params.originSize = httpResponse.headers['content-length'] || 0;
 
       // Check if the response should be compressed
       if (shouldCompress(req)) {
