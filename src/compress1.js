@@ -27,9 +27,9 @@ const sharpStream = () => sharp({ unlimited: true });
   input.pipe(sharpStream()
     .grayscale(req.params.grayscale)
     .toFormat(format, {
-      quality: req.params.quality,
-      progressive: true,
-      optimizeScans: true
+      quality: req.params.quality
+    //  progressive: true,
+     // optimizeScans: true
     })
     .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)))
 }
