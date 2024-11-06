@@ -14,8 +14,7 @@
     "express": "4.21.1",
     "got": "14.4.4",
     "lodash": "4.17.21",
-    "sharp": "0.33.5",
-    "tough-cookie": "5.0.0"
+    "sharp": "0.33.5"
   },
   "engines": {
     "node": "20.x"
