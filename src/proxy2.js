@@ -8,7 +8,7 @@ import _ from "lodash";
 import got from "got";
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
-import compress from "./compress1.js";
+import compress from "./compress2.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
