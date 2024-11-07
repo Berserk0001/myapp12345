@@ -23,10 +23,9 @@ async function proxy(req, res) {
         "x-forwarded-for": req.socket.localAddress,
         via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
       },
-    //decompress: false,
+    decompress: false,
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false // Do not throw errors for non-2xx responses
-    // timeout: 5000, // Timeout for the request (in ms)
     });
 
 
@@ -36,7 +35,6 @@ async function proxy(req, res) {
       if (httpResponse.statusCode !== 200) {
         // If the response status is not 200, redirect the client
        return redirect(req, res);
-       // responseStream.destroy(); // Destroy the stream after redirect
       }
 
       // Copy headers and set necessary response headers
