@@ -13,6 +13,7 @@
   "dependencies": {
     "express": "4.21.1",
     "got": "14.4.4",
+    "undici": "5.28.4",
     "lodash": "4.17.21",
     "sharp": "0.33.5"
   },
