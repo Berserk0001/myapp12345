@@ -6,6 +6,7 @@
  */
 import _ from "lodash";
 import got from "got";
+import { randomDesktopUA } from './ua.js'
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
 import compress from "./compress2.js";
@@ -18,7 +19,7 @@ async function proxy(req, res) {
     let responseStream = await got.stream(req.params.url, {
       headers: {
         ...pick(req.headers, ["dnt"]),
-        "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+        "user-agent": randomDesktopUA(),
         "x-forwarded-for": req.socket.localAddress,
         via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
       },
