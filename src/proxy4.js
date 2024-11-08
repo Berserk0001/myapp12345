@@ -4,20 +4,23 @@
  * The bandwidth hero proxy handler.
  * proxy(httpRequest, httpResponse);
  */
-const undici = require("undici");
-const pick = require("lodash").pick;
-const shouldCompress = require("./shouldCompress");
-const redirect = require("./redirect");
-const compress = require("./compress");
-const copyHeaders = require("./copyHeaders");
+import undici from "undici";
+import { randomDesktopUA } from './ua.js'
+import shouldCompress from "./shouldCompress.js";
+import redirect from "./redirect.js";
+import compress from "./compress2.js";
+import copyHeaders from "./copyHeaders.js";
+const { pick } = _;
 
 async function proxy(req, res) {
   /*
    * Avoid loopback that could cause server hang.
    */
   
-  const url = req.params.url;
-  const options = {
+  
+
+  try {
+    const options = {
     headers: {
         ...pick(req.headers, ["dnt"]),
         "user-agent": randomDesktopUA(),
@@ -26,9 +29,8 @@ async function proxy(req, res) {
       },
     maxRedirections: 2
   };
-
-  try {
-    let origin = await undici.request(url, options); // Await the request
+    
+    let origin = await undici.request(req.params.url, options); // Await the request
 
     if (origin.statusCode >= 400 || (origin.statusCode >= 300 && origin.headers.location)) {
       // Redirect if status is 4xx or redirect location is present
