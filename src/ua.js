@@ -202,4 +202,4 @@ export const randomMobileUA = () => {
 
 export const randomDesktopUA = () => {
   return userAgent.desktop[randomFromLength(userAgent.desktop)]
-}
+    }
