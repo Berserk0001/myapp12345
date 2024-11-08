@@ -5,6 +5,7 @@
  * proxy(httpRequest, httpResponse);
  */
 import undici from "undici";
+import _ from "lodash";
 import { randomDesktopUA } from './ua.js'
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
