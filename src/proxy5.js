@@ -33,7 +33,7 @@ const { pick } = _;
 
   // Listen for the response event to check status and set headers
   responseStream.on('response', (httpResponse) => {
-    if (httpResponse.statusCode >= 400) {
+    if (httpResponse.statusCode >= 400 || httpResponse.statusCode >= 500 || httpResponse.statusCode >= 300) {
      // req.socket.destroy(); // Close the socket if there's an error status
       return redirect(req, res);  // Redirect on any 4xx/5xx error
     }
