@@ -30,7 +30,7 @@ const { pick } = _;
   };
 
   // Make the request using `got` with the defined options
-  const responseStream = got(req.params.url, options);
+  let responseStream = got(req.params.url, options);
 
   // Listen for the response event to check status and set headers
   responseStream.on('response', (httpResponse) => {
