@@ -16,20 +16,21 @@ const { pick } = _;
  function proxy(req, res) {
   try {
   // Define the common options for `got`
-  const options = {
+    const options = {
     headers: {
       ...pick(req.headers, ["dnt"]),
       "user-agent": randomDesktopUA(),
       "x-forwarded-for": req.socket.localAddress,
       via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
     },
-    decompress: true,
+    decompress: false,
     maxRedirects: 4,
     throwHttpErrors: false, // Allow handling of non-2xx responses
+    isStream: true // Enable streaming behavior
   };
 
-  // Make the request using `got`, spreading `options` and adding `isStream: true`
-  let responseStream = got(req.params.url, { ...options, isStream: true });
+  // Make the request using `got` with the defined options
+  const responseStream = got(req.params.url, options);
 
   // Listen for the response event to check status and set headers
   responseStream.on('response', (httpResponse) => {
