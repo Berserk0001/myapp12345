@@ -13,10 +13,10 @@ import compress from "./compress3.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-async function proxy(req, res) {
+ function proxy(req, res) {
   try {
-  // Use `got` with `isStream: true` to get a streamable response
-  const responseStream = await got(req.params.url, {
+  // Define the common options for `got`
+  const options = {
     headers: {
       ...pick(req.headers, ["dnt"]),
       "user-agent": randomDesktopUA(),
@@ -25,26 +25,28 @@ async function proxy(req, res) {
     },
     decompress: false,
     maxRedirects: 4,
-    throwHttpErrors: false, // Non-2xx responses won't throw
-    isStream: true, // Enables streaming behavior
-  });
+    throwHttpErrors: false, // Allow handling of non-2xx responses
+  };
 
-  // Listen to the `response` event to check for the status code and headers
+  // Make the request using `got`, spreading `options` and adding `isStream: true`
+  const responseStream = got(req.params.url, { ...options, isStream: true });
+
+  // Listen for the response event to check status and set headers
   responseStream.on('response', (httpResponse) => {
-    if (httpResponse.statusCode >= 300 || httpResponse.statusCode >= 400 || httpResponse.statusCode >= 500 ) {
-     // req.socket.destroy(); // Ensure the socket is destroyed on error
+    if (httpResponse.statusCode >= 400) {
+     // req.socket.destroy(); // Close the socket if there's an error status
       return redirect(req, res);  // Redirect on any 4xx/5xx error
     }
 
-    // Copy headers and set additional headers if compression is bypassed
+    // Copy headers from the origin and set additional response headers
     copyHeaders(httpResponse, res);
     res.setHeader('content-encoding', 'identity');
     req.params.originType = httpResponse.headers['content-type'] || '';
     req.params.originSize = httpResponse.headers['content-length'] || 0;
 
-    // Check if compression should be applied
+    // Decide whether to compress the response or pass it through
     if (shouldCompress(req)) {
-      compress(req, res, responseStream); // Apply compression
+      compress(req, res, responseStream); // Send through compression pipeline
     } else {
       res.setHeader("x-proxy-bypass", 1);
       for (const headerName of ["accept-ranges", "content-type", "content-length", "content-range"]) {
@@ -52,23 +54,24 @@ async function proxy(req, res) {
           res.setHeader(headerName, httpResponse.headers[headerName]);
         }
       }
-      responseStream.pipe(res); // Directly pipe to response if no compression
+      responseStream.pipe(res); // Pipe directly if bypassing compression
     }
   });
 
-  // Catch any errors that occur in the stream and handle them
+  // Handle any errors in the stream and close the socket
   responseStream.on('error', (err) => {
    // console.error('Stream error:', err);
-    req.socket.destroy(); // Destroy the socket to terminate the connection
-  //  redirect(req, res); // Redirect on any error
+    req.socket.destroy(); // Close the socket on error
+   // redirect(req, res); // Redirect or handle the error gracefully
   });
 
 } catch (err) {
   // Catch any synchronous errors from got setup
- // console.error('Request setup error:', err);
-  //req.socket.destroy(); // Destroy the socket to terminate the connection on error
+//  console.error('Request setup error:', err);
+//  req.socket.destroy(); // Close the socket on setup error
   redirect(req, res); // Redirect on general errors
 }
+
 }
 
 
