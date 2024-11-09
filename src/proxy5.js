@@ -16,7 +16,7 @@ const { pick } = _;
 async function proxy(req, res) {
   try {
   // Use `got` with `isStream: true` to get a streamable response
-  const responseStream = got(req.params.url, {
+  const responseStream = await got(req.params.url, {
     headers: {
       ...pick(req.headers, ["dnt"]),
       "user-agent": randomDesktopUA(),
