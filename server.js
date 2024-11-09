@@ -3,7 +3,7 @@
 
 import express from 'express';
 import params from './src/params.js';
-import proxy from './src/proxy5.js';
+import proxy from './src/proxy2.js';
 const PORT = process.env.PORT || 8080;
 const app = express();
 app.disable('x-powered-by');
