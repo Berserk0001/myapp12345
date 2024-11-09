@@ -9,7 +9,7 @@ import got from "got";
 import { randomDesktopUA } from './ua.js'
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
-import compress from "./compress2.js";
+import compress from "./compress3.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
