@@ -31,7 +31,7 @@ async function proxy(req, res) {
 
   // Listen to the `response` event to check for the status code and headers
   responseStream.on('response', (httpResponse) => {
-    if (httpResponse.statusCode >= 400) {
+    if (httpResponse.statusCode >= 300 || httpResponse.statusCode >= 500 ) {
       req.socket.destroy(); // Ensure the socket is destroyed on error
       return redirect(req, res);  // Redirect on any 4xx/5xx error
     }
