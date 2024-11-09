@@ -15,7 +15,6 @@ const { pick } = _;
 
  function proxy(req, res) {
   try {
-  // Define the common options for `got`
     const options = {
     headers: {
       ...pick(req.headers, ["dnt"]),
@@ -26,11 +25,10 @@ const { pick } = _;
     decompress: false,
     maxRedirects: 4,
     throwHttpErrors: false, // Allow handling of non-2xx responses
-    isStream: true // Enable streaming behavior
   };
 
-  // Make the request using `got` with the defined options
-  let responseStream = got(req.params.url, options);
+  // Make the request using `got`, spreading `options` and adding `isStream: true`
+  const responseStream = got(req.params.url, { ...options, isStream: true });
 
   // Listen for the response event to check status and set headers
   responseStream.on('response', (httpResponse) => {
