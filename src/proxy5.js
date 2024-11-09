@@ -26,7 +26,7 @@ const { pick } = _;
     decompress: false,
     maxRedirects: 4,
     throwHttpErrors: false, // Allow handling of non-2xx responses
-  //  isStream: true // Enable streaming behavior
+    isStream: true // Enable streaming behavior
   };
 
   // Make the request using `got` with the defined options
