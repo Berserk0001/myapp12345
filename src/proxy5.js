@@ -32,7 +32,7 @@ async function proxy(req, res) {
   // Listen to the `response` event to check for the status code and headers
   responseStream.on('response', (httpResponse) => {
     if (httpResponse.statusCode >= 300 || httpResponse.statusCode >= 400 || httpResponse.statusCode >= 500 ) {
-      req.socket.destroy(); // Ensure the socket is destroyed on error
+     // req.socket.destroy(); // Ensure the socket is destroyed on error
       return redirect(req, res);  // Redirect on any 4xx/5xx error
     }
 
@@ -58,15 +58,15 @@ async function proxy(req, res) {
 
   // Catch any errors that occur in the stream and handle them
   responseStream.on('error', (err) => {
-    console.error('Stream error:', err);
+   // console.error('Stream error:', err);
     req.socket.destroy(); // Destroy the socket to terminate the connection
-    redirect(req, res); // Redirect on any error
+  //  redirect(req, res); // Redirect on any error
   });
 
 } catch (err) {
   // Catch any synchronous errors from got setup
-  console.error('Request setup error:', err);
-  req.socket.destroy(); // Destroy the socket to terminate the connection on error
+ // console.error('Request setup error:', err);
+  //req.socket.destroy(); // Destroy the socket to terminate the connection on error
   redirect(req, res); // Redirect on general errors
 }
 }
