@@ -13,7 +13,7 @@ async function compress(req, res, input) {
   let resizeWidth = null;
   let resizeHeight = null;
   let effortCPU = 6;
-  let format = webp ? 'webp' : 'jpeg';
+  let format = 'webp';
     const metadata = await sharp(input).metadata();
     const imgHeight = metadata.height;
     const imgWidth = metadata.width;
