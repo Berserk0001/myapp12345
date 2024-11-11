@@ -25,8 +25,7 @@ function compress(req, res, input) {
     })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
-      quality: req.params.quality,
-      effort: 0
+      quality: req.params.quality
     })
     .on('error', (err) => {
       console.error('Sharp error:', err.message || err);
