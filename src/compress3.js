@@ -12,6 +12,8 @@ const sharpStream = () => sharp({ unlimited: true });
 
 function compress(req, res, input) {
   const format = 'webp';
+  let resizeWidth = null
+	let resizeHeight = 16383
 
   /*
    * Determine the uncompressed image size when there's no content-length header.
@@ -27,10 +29,11 @@ function compress(req, res, input) {
    */
 
   input.pipe(sharpStream()
+    .resize({
+			width: resizeWidth,
+			height: resizeHeight
+		})
     .grayscale(req.params.grayscale)
-    .resize({width: req.params.imgWidth,
-             height: req.params.imgHeight
-            })
     .toFormat(format, {
       quality: req.params.quality
     })
