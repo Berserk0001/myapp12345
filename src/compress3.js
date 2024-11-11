@@ -22,7 +22,9 @@ function compress(req, res, input) {
     .resize(width, height)
     .grayscale(req.params.grayscale)
     .toFormat(format, {
-      quality: req.params.quality
+      quality: req.params.quality,
+      preset: 'picture',
+			effort: 0
     })
     .on('error', (err) => {
       console.error('Sharp error:', err.message || err);
