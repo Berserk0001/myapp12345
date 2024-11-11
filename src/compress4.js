@@ -44,9 +44,14 @@ function compress(req, res, input) {
         quality *= 0.5;
         effortCPU = 6;
       }
+      const width = resizeWidth
+      const height = resizeHeight
 
       input.pipe(sharpStream()
-        .resize(resizeWidth, resizeHeight)
+        .resize(width, height, {
+      fit: 'inside',
+      withoutEnlargement: true
+    })
         .grayscale(req.params.grayscale)
         .toFormat(format, {
           quality: quality
