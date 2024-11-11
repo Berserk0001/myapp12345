@@ -16,7 +16,7 @@ function compress(req, res, input) {
  
   input.pipe(sharpStream()
     .resize(null, 16383, {
-     // fit: 'inside',
+      fit: 'fill',
       withoutEnlargement: true
     //  withoutReduction: true
     })
