@@ -17,8 +17,8 @@ function compress(req, res, input) {
   input.pipe(sharpStream()
     .resize(null, 16383, {
      // fit: 'inside',
-      withoutEnlargement: true,
-      withoutReduction: true
+      withoutEnlargement: true
+    //  withoutReduction: true
     })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
