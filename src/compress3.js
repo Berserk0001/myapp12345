@@ -5,27 +5,22 @@
  */
 import sharp from 'sharp';
 import redirect from './redirect.js';
+
 sharp.cache(false);
 sharp.concurrency(1);
 
 const sharpStream = () => sharp({ unlimited: true });
 
 function compress(req, res, input) {
-  const format = 'jpeg';
-  /*
-   * Determine the uncompressed image size when there's no content-length header.
-   */
-
-  /*
-   * input.pipe => sharp (The compressor) => Send to httpResponse
-   * The following headers:
-   * |  Header Name  |            Description            |           Value            |
-   * |---------------|-----------------------------------|----------------------------|
-   * |x-original-size|Original photo size                |OriginSize                  |
-   * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
-   */
+  const format = 'webp';
+  const width = req.params.width || 800; // Default width to 800 if not provided
+  const height = req.params.height || 800; // Default height to 800 if not provided
 
   input.pipe(sharpStream()
+    .resize(width, height, {
+      fit: 'inside',
+      withoutEnlargement: true
+    })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality
