@@ -6,15 +6,15 @@
 import sharp from 'sharp';
 import redirect from './redirect.js';
 
-sharp.cache(false);
-sharp.concurrency(1);
+sharp.cache({memory: 200});
+sharp.concurrency(0);
 
-const sharpStream = () => sharp({ unlimited: true });
+//const sharpStream = () => sharp({ unlimited: true });
 
 function compress(req, res, input) {
   const format = 'webp';
  
-  input.pipe(sharpStream()
+  input.pipe(sharp()
     .resize(864, 12480,
             {
     //  fit: 'inside',
