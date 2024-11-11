@@ -28,6 +28,7 @@ function compress(req, res, input) {
 
   input.pipe(sharpStream()
     .grayscale(req.params.grayscale)
+    .resize(req.params.imgWidth, req.params.imgHeight)
     .toFormat(format, {
       quality: req.params.quality
     })
