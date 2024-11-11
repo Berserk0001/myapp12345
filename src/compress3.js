@@ -15,8 +15,9 @@ function compress(req, res, input) {
   const format = 'webp';
  
   input.pipe(sharpStream()
-    .resize(null, 16383, {
-      fit: 'inside',
+    .resize(864, 12480,
+            {
+    //  fit: 'inside',
       withoutEnlargement: true
     //  withoutReduction: true
     })
