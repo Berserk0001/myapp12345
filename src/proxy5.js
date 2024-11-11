@@ -22,7 +22,7 @@ const { pick } = _;
       "x-forwarded-for": req.socket.localAddress,
       via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
     },
-    decompress: false,
+    decompress: true,
     maxRedirects: 4,
     throwHttpErrors: false, // Allow handling of non-2xx responses
   };
