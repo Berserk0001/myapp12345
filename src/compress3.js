@@ -26,7 +26,6 @@ function compress(req, res, input) {
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality,
-      preset: 'picture',
       effort: 0
     })
     .on('error', (err) => {
