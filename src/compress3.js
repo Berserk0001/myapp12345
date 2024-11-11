@@ -20,14 +20,14 @@ function compress(req, res, input) {
 
   input.pipe(sharpStream()
     .resize(width, height, {
-      fit: 'inside',
-     // withoutEnlargement: true
+     // fit: 'inside',
+      withoutEnlargement: true
     })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality,
       preset: 'picture',
-			effort: 0
+      effort: 0
     })
     .on('error', (err) => {
       console.error('Sharp error:', err.message || err);
