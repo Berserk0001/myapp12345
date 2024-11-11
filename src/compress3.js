@@ -9,35 +9,34 @@ import redirect from './redirect.js';
 sharp.cache({memory: 200});
 sharp.concurrency(0);
 
-//const sharpStream = () => sharp({ unlimited: true });
-
 function compress(req, res, input) {
   const format = 'webp';
- 
-  input.pipe(sharp()
-    .resize(864, 12480,
-            {
-    //  fit: 'inside',
-      withoutEnlargement: true
-    //  withoutReduction: true
-    })
-    .grayscale(req.params.grayscale)
-    .toFormat(format, {
-      quality: req.params.quality
-     // effort: 1
-    })
-    .on('error', (err) => {
-      console.error('Sharp error:', err.message || err);
-      return redirect(req, res);
-    })
-    .on('info', (info) => {
-      res.setHeader('content-type', 'image/' + format);
-      res.setHeader('content-length', info.size);
-      res.setHeader('x-original-size', req.params.originSize);
-      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-      res.status(200);
-    })
-  ).pipe(res);
+
+  try {
+    input.pipe(sharp()
+      .resize(864, 12480, {
+        withoutEnlargement: true
+      })
+      .grayscale(req.params.grayscale)
+      .toFormat(format, {
+        quality: req.params.quality
+      })
+      .on('info', (info) => {
+        res.setHeader('content-type', 'image/' + format);
+        res.setHeader('content-length', info.size);
+        res.setHeader('x-original-size', req.params.originSize);
+        res.setHeader('x-bytes-saved', req.params.originSize - info.size);
+        res.status(200);
+      })
+      .on('error', (err) => {
+        console.error('Sharp error:', err.message || err);
+        redirect(req, res);
+      })
+    ).pipe(res);
+  } catch (err) {
+    console.error('Synchronous error:', err.message || err);
+    redirect(req, res);
+  }
 }
 
 export default compress;
