@@ -29,10 +29,6 @@ function compress(req, res, input) {
    */
 
   input.pipe(sharpStream()
-    .resize({
-			width: resizeWidth,
-			height: resizeHeight
-		})
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality
