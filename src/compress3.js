@@ -13,15 +13,12 @@ const sharpStream = () => sharp({ unlimited: true });
 
 function compress(req, res, input) {
   const format = 'webp';
-  let maxWidth = null;
-  let maxHeight = 16383;
-  const width = maxWidth; // Default width to maxWidth if not provided
-  const height = maxHeight; // Default height to maxHeight if not provided
-
+ 
   input.pipe(sharpStream()
-    .resize(width, height, {
+    .resize(null, 16383, {
      // fit: 'inside',
-      withoutEnlargement: true
+      withoutEnlargement: true,
+      withoutReduction: true
     })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
