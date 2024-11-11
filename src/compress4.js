@@ -6,14 +6,14 @@ sharp.concurrency(1);
 const sharpStream = () => sharp({ unlimited: true });
 
 async function compress(req, res, input) {
-  const quality = req.params.quality || 80;
+
+  try {
+  const quality = req.params.quality;
   let compressionQuality = quality;
   let resizeWidth = null;
   let resizeHeight = null;
   let effortCPU = 6;
   let format = webp ? 'webp' : 'jpeg';
-
-  try {
     const metadata = await sharp(input).metadata();
     const imgHeight = metadata.height;
     const imgWidth = metadata.width;
