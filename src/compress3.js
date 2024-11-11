@@ -19,7 +19,10 @@ function compress(req, res, input) {
   const height = maxHeight; // Default height to maxHeight if not provided
 
   input.pipe(sharpStream()
-    .resize(width, height)
+    .resize(width, height, {
+      fit: 'inside',
+     // withoutEnlargement: true
+    })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality,
