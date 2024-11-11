@@ -1,62 +1,60 @@
+/*
+ * compress.js
+ * A module that compresses an image.
+ * compress(httpRequest, httpResponse, ReadableStream);
+ */
 import sharp from 'sharp';
 import redirect from './redirect.js';
 sharp.cache(false);
 sharp.concurrency(1);
 
-const sharpStream = () => sharp({ unlimited: true });
-
-async function compress(req, res, input) {
-
-  try {
-  const quality = req.params.quality;
-  let compressionQuality = quality;
-  let resizeWidth = null;
-  let resizeHeight = null;
-  let effortCPU = 6;
-  let format = 'webp';
-    const metadata = await sharp(input).metadata();
-    const imgHeight = metadata.height;
-    const imgWidth = metadata.width;
-
-    // Apply compression logic based on image dimensions
-    if (imgHeight > 12480) {
-      format = 'webp';
-      compressionQuality *= 0.5;
-      resizeHeight = 12480;
-    } else if (imgWidth > 1280 && imgHeight < 9360) {
-      format = 'webp';
-      compressionQuality *= 0.5;
-      resizeWidth = 960;
-    } else if (imgWidth > 960 && imgHeight < 2880) {
-      format = 'webp';
-      compressionQuality *= 0.5;
-      resizeWidth = 864;
-    } else {
-      format = 'webp';
-      compressionQuality *= 0.5;
-    }
-
-    input.pipe(
-      sharpStream()
-        .resize({
-          width: resizeWidth,
-          height: resizeHeight
-        })
-        .grayscale(req.params.grayscale)
-        .toFormat(format, { quality: compressionQuality, effort: effortCPU })
-        .on('info', (info) => {
-          res.setHeader('content-type', `image/${format}`);
-          res.setHeader('content-length', info.size);
-          res.setHeader('x-original-size', req.params.originSize);
-          res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-          res.status(200);
-        })
-    ).pipe(res);
-
-  } catch (error) {
-    console.error('Error processing image:', error);
-    redirect(req, res);
+const sharpStream = (format, quality, resizeOptions) => {
+  let pipeline = sharp({ unlimited: true }).toFormat(format, { quality });
+  if (resizeOptions) {
+    pipeline = pipeline.resize(resizeOptions);
   }
+  return pipeline;
+};
+
+function compress(req, res, input) {
+  let format = 'jpeg';
+  let compressionQuality = req.params.quality || 80;
+  let resizeOptions = null;
+  const imgWidth = req.params.imgWidth;
+  const imgHeight = req.params.imgHeight;
+
+  // Adjust format, compression quality, and resizing based on image dimensions
+  if (imgHeight > 12480) { // Longstrip image
+    format = 'webp';
+    compressionQuality *= 0.5;
+    resizeOptions = { height: 12480 };
+  } else if (imgWidth > 1280 && imgHeight < 9360) {
+    format = 'webp';
+    compressionQuality *= 0.5;
+    resizeOptions = { width: 960 };
+  } else if (imgWidth > 960 && imgHeight < 2880) {
+    format = 'webp';
+    compressionQuality *= 0.5;
+    resizeOptions = { width: 864 };
+  } else {
+    format = 'webp';
+    compressionQuality *= 0.5;
+  }
+
+  input.pipe(sharpStream(format, compressionQuality, resizeOptions)
+    .grayscale(req.params.grayscale)
+    .on('error', (err) => {
+      console.error('Sharp error:', err.message || err);
+      return redirect(req, res);
+    })
+    .on('info', (info) => {
+      res.setHeader('content-type', 'image/' + format);
+      res.setHeader('content-length', info.size);
+      res.setHeader('x-original-size', req.params.originSize);
+      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
+      res.status(200);
+    })
+  ).pipe(res);
 }
 
 export default compress;
