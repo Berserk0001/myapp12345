@@ -6,15 +6,15 @@
 import sharp from 'sharp';
 import redirect from './redirect.js';
 
-sharp.cache({memory: 200});
-sharp.concurrency(0);
+/*sharp.cache({memory: 200});
+sharp.concurrency(0);*/
 
 function compress(req, res, input) {
   const format = 'webp';
 
   try {
     input.pipe(sharp()
-      .resize(864, 12480, {
+      .resize(null, 16383, {
         withoutEnlargement: true
       })
       .grayscale(req.params.grayscale)
