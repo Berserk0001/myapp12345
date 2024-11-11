@@ -11,55 +11,63 @@ sharp.concurrency(1);
 const sharpStream = () => sharp({ unlimited: true });
 
 function compress(req, res, input) {
-  let format = 'webp';
-  let compressionQuality = req.params.quality;
-  const imgWidth = req.params.imgWidth;
-  const imgHeight = req.params.imgHeight;
-  let resizeWidth = null;
-  let resizeHeight = null;
-  let effortCPU = 1;
+  const compressionQuality = req.params.quality;
 
-  if (imgHeight > 12480) {
-    // damn longstrip image
-    format = 'webp';
-    compressionQuality *= 0.5;
-    resizeHeight = 12480;
-    effortCPU = 6;
-  } else if (imgWidth > 1280 && imgHeight < 9360) {
-    format = 'webp';
-    compressionQuality *= 0.5;
-    resizeWidth = 960;
-    effortCPU = 6;
-  } else if (imgWidth > 960 && imgHeight < 2880) {
-    format = 'webp';
-    compressionQuality *= 0.5;
-    resizeWidth = 864;
-    effortCPU = 6;
-  } else {
-    format = 'webp';
-    compressionQuality *= 0.5;
-    effortCPU = 6;
-  }
+  // Extract metadata from the image
+  sharp(input)
+    .metadata()
+    .then(metadata => {
+      let format = 'webp';
+      let resizeWidth = null;
+      let resizeHeight = null;
+      let effortCPU = 1;
+      let quality = compressionQuality;
 
-  input.pipe(sharpStream()
-    .resize(resizeWidth, resizeHeight)
-    .grayscale(req.params.grayscale)
-    .toFormat(format, {
-      quality: compressionQuality,
-      effort: effortCPU
+      if (metadata.height > 12480) {
+        // damn longstrip image
+        format = 'webp';
+        quality *= 0.5;
+        resizeHeight = 12480;
+        effortCPU = 6;
+      } else if (metadata.width > 1280 && metadata.height < 9360) {
+        format = 'webp';
+        quality *= 0.5;
+        resizeWidth = 960;
+        effortCPU = 6;
+      } else if (metadata.width > 960 && metadata.height < 2880) {
+        format = 'webp';
+        quality *= 0.5;
+        resizeWidth = 864;
+        effortCPU = 6;
+      } else {
+        format = 'webp';
+        quality *= 0.5;
+        effortCPU = 6;
+      }
+
+      input.pipe(sharpStream()
+        .resize(resizeWidth, resizeHeight)
+        .grayscale(req.params.grayscale)
+        .toFormat(format, {
+          quality: quality
+        })
+        .on('error', (err) => {
+          console.error('Sharp error:', err.message || err);
+          return redirect(req, res);
+        })
+        .on('info', (info) => {
+          res.setHeader('content-type', 'image/' + format);
+          res.setHeader('content-length', info.size);
+          res.setHeader('x-original-size', req.params.originSize);
+          res.setHeader('x-bytes-saved', req.params.originSize - info.size);
+          res.status(200);
+        })
+      ).pipe(res);
     })
-    .on('error', (err) => {
-      console.error('Sharp error:', err.message || err);
+    .catch(err => {
+      console.error('Metadata extraction error:', err.message || err);
       return redirect(req, res);
-    })
-    .on('info', (info) => {
-      res.setHeader('content-type', 'image/' + format);
-      res.setHeader('content-length', info.size);
-      res.setHeader('x-original-size', req.params.originSize);
-      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-      res.status(200);
-    })
-  ).pipe(res);
+    });
 }
 
 export default compress;
