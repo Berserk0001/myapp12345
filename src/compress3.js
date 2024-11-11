@@ -19,7 +19,8 @@ function compress(req, res, input) {
       })
       .grayscale(req.params.grayscale)
       .toFormat(format, {
-        quality: req.params.quality
+        quality: req.params.quality,
+        effort: 0
       })
       .on('info', (info) => {
         res.setHeader('content-type', 'image/' + format);
