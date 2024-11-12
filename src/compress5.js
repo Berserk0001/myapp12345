@@ -27,7 +27,7 @@ function compress(req, res, input) {
    */
 
   input.body.pipe(sharp()
-    .resize(null, 16383, {
+    .resize(null, 8000, {
         withoutEnlargement: true
       })
     .grayscale(req.params.grayscale)
