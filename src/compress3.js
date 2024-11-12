@@ -6,8 +6,8 @@
 import sharp from 'sharp';
 import redirect from './redirect.js';
 
-/*sharp.cache({memory: 200});
-sharp.concurrency(0);*/
+sharp.cache(false);
+sharp.concurrency(1);
 
 function compress(req, res, input) {
   const format = 'webp';
