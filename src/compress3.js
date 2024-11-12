@@ -13,7 +13,7 @@ function compress(req, res, input) {
   const format = 'webp';
 
   try {
-    input.pipe(sharp()
+    input.body.pipe(sharp()
       .resize(null, 16383, {
         withoutEnlargement: true
       })
