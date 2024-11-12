@@ -8,10 +8,10 @@ import redirect from './redirect.js';
 sharp.cache(false);
 sharp.concurrency(1);
 
-const sharpStream = () => sharp({ unlimited: true });
+//const sharpStream = () => sharp({ unlimited: true });
 
 function compress(req, res, input) {
-  const format = 'jpeg';
+  let format = 'jpeg';
 
   /*
    * Determine the uncompressed image size when there's no content-length header.
@@ -26,7 +26,7 @@ function compress(req, res, input) {
    * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
    */
 
-  input.body.pipe(sharpStream()
+  input.body.pipe(sharp({ unlimited: true })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality,
