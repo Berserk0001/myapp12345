@@ -26,15 +26,14 @@ function compress(req, res, input) {
    * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
    */
 
-  input.body.pipe(sharp()
+  input.body.pipe(sharp({ unlimited: true })
     .resize(null, 16383, {
         withoutEnlargement: true
       })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality,
-      progressive: true,
-      optimizeScans: true
+      progressive: true
     })
     .on('error', (err) => {
       console.error('Sharp error:', err.message || err);
