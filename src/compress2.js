@@ -29,7 +29,9 @@ function compress(req, res, input) {
   input.body.pipe(sharpStream()
     .grayscale(req.params.grayscale)
     .toFormat(format, {
-      quality: req.params.quality
+      quality: req.params.quality,
+      progressive: true,
+      optimizeScans: true
     })
     .on('error', (err) => {
       console.error('Sharp error:', err.message || err);
