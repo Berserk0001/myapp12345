@@ -9,7 +9,7 @@ import _ from "lodash";
 import { randomDesktopUA } from './ua.js'
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
-import compress from "./compress5.js";
+import compress from "./compress2.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
