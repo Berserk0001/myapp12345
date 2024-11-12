@@ -26,7 +26,7 @@ function compress(req, res, input) {
    * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
    */
 
-  input.body.pipe(sharp({ unlimited: true })
+  input.body.pipe(sharp()
     .grayscale(req.params.grayscale)
     .toFormat(format, {
       quality: req.params.quality,
