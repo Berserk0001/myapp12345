@@ -5,12 +5,13 @@
  */
 import sharp from 'sharp';
 import redirect from './redirect.js';
-//sharp.cache(false);
-//sharp.concurrency(1);
-const sharpStream = () => sharp({ unlimited: true });
+sharp.cache(false);
+sharp.concurrency(1);
 
- function compress(req, res, input) {
-  const format = 'jpeg'
+//const sharpStream = () => sharp({ unlimited: true });
+
+function compress(req, res, input) {
+  let format = 'webp';
 
   /*
    * Determine the uncompressed image size when there's no content-length header.
@@ -24,26 +25,28 @@ const sharpStream = () => sharp({ unlimited: true });
    * |x-original-size|Original photo size                |OriginSize                  |
    * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
    */
-  input.pipe(sharpStream()
+
+  input.pipe(sharp()
+    .resize(null, 12480, {
+        withoutEnlargement: true
+      })
     .grayscale(req.params.grayscale)
     .toFormat(format, {
-      quality: req.params.quality
-    //  progressive: true,
-     // optimizeScans: true
+      quality: req.params.quality,
+      effort: 0
     })
-    .toBuffer((err, output, info) => _sendResponse(err, output, info, format, req, res)))
-}
-
-function _sendResponse(err, output, info, format, req, res) {
-  if (err || !info) return redirect(req, res);
-
-  res.setHeader('content-type', 'image/' + format);
-  res.setHeader('content-length', info.size);
-  res.setHeader('x-original-size', req.params.originSize);
-  res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-  res.status(200);
-  res.write(output);
-  res.end();
+    .on('error', (err) => {
+      console.error('Sharp error:', err.message || err);
+      return redirect(req, res);
+    })
+    .on('info', (info) => {
+      res.setHeader('content-type', 'image/' + format);
+      res.setHeader('content-length', info.size);
+      res.setHeader('x-original-size', req.params.originSize);
+      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
+      res.status(200);
+    })
+  ).pipe(res);
 }
 
 export default compress;
