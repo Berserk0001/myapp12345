@@ -13,11 +13,11 @@ import compress from "./compress1.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-async function proxy(req, res) {
+function proxy(req, res) {
   try {
     // Fetch the image as a stream using `got`
     let userAgent = randomDesktopUA();
-    let responseStream = await got.stream(req.params.url, {
+    let responseStream = got.stream(req.params.url, {
       headers: {
         ...pick(req.headers, ["dnt"]),
         "user-agent": userAgent,
@@ -30,7 +30,7 @@ async function proxy(req, res) {
     });
 
     // Handle the response before streaming
-    responseStream.on('response', (httpResponse) => {
+    responseStream.once('response', (httpResponse) => {
       if (httpResponse.statusCode !== 200) {
         // Redirect if the status is not 200
         return redirect(req, res);
