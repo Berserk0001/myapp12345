@@ -16,10 +16,11 @@ const { pick } = _;
 async function proxy(req, res) {
   try {
     // Fetch the image as a stream using `got`
+    let userAgent = randomDesktopUA();
     let responseStream = await got.stream(req.params.url, {
       headers: {
         ...pick(req.headers, ["dnt"]),
-        "user-agent": randomDesktopUA(),
+        "user-agent": userAgent,
         "x-forwarded-for": req.socket.localAddress,
         via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
       },
@@ -31,28 +32,28 @@ async function proxy(req, res) {
     // Handle the response before streaming
     responseStream.on('response', (httpResponse) => {
       if (httpResponse.statusCode !== 200) {
-        // If the response status is not 200, redirect the client
+        // Redirect if the status is not 200
         return redirect(req, res);
       }
+
+      // Set originType and originSize parameters
+      req.params.originType = httpResponse.headers['content-type'] || '';
+      req.params.originSize = httpResponse.headers['content-length'] || 0;
 
       // Copy headers and set necessary response headers
       copyHeaders(httpResponse, res);
       res.setHeader('content-encoding', 'identity');
 
-      req.params.originType = httpResponse.headers['content-type'] || '';
-      req.params.originSize = httpResponse.headers['content-length'] || 0;
-
-      // Check if the response should be compressed
-      if (shouldCompress(req)) {
-        compress(req, res, responseStream); // Send stream to compression
-      } else {
-        // Bypass compression and pipe the response directly
+      // Bypass compression if the response is not an image or should not be compressed
+      if (!req.params.originType.startsWith('image') || !shouldCompress(req)) {
         res.setHeader("x-proxy-bypass", 1);
-        // Set specific headers
+        // Set specific headers for bypassed content
         for (const headerName of ["accept-ranges", "content-type", "content-length", "content-range"]) {
           if (headerName in httpResponse.headers) res.setHeader(headerName, httpResponse.headers[headerName]);
         }
-        responseStream.pipe(res);
+        responseStream.pipe(res); // Pipe non-compressed response directly
+      } else {
+        compress(req, res, responseStream); // Send stream to compression
       }
     });
 
@@ -61,7 +62,6 @@ async function proxy(req, res) {
 
   } catch (err) {
     console.error('Proxy error:', err.message || err);
-
     // Redirect if an error occurs in the try-catch
     return redirect(req, res);
   }
