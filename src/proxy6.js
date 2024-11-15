@@ -20,11 +20,16 @@ function proxy(req, res) {
       via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
     },
     maxRedirects: 4, // Handles redirections
-    validateStatus: (status) => status === 200, // Accept only 200 OK
+    validateStatus: null, // Do not throw errors for non-2xx responses
   };
 
   axios(axiosConfig)
     .then((axiosResponse) => {
+      if (axiosResponse.status !== 200) {
+        // Redirect if the status is not 200
+        return redirect(req, res);
+      }
+
       // Set originType and originSize parameters
       req.params.originType = axiosResponse.headers['content-type'] || '';
       req.params.originSize = axiosResponse.headers['content-length'] || 0;
@@ -46,8 +51,8 @@ function proxy(req, res) {
       }
     })
     .catch((err) => {
-      console.error('Proxy error or non-200 response:', err.message || err);
-      // Redirect for any error or non-200 response
+      console.error('Proxy error:', err.message || err);
+      // Redirect if an error occurs
       redirect(req, res);
     });
 }
