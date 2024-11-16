@@ -23,7 +23,7 @@ export default function compress(req, res, input) {
 
 
 
-  input.pipe(
+  input.data.pipe(
     sharpStream()
       .resize(null, 12480)
       .grayscale(false)
