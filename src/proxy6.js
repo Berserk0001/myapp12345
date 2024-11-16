@@ -11,12 +11,13 @@ const { pick } = _;
   
 
   try {
+   let userAgent = randomDesktopUA();
     let response = axios.get(req.params.url, {
       headers: {
         ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0",
-        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
-        via: "1.1 myapp-hero",
+        "user-agent": userAgent,
+        "x-forwarded-for": req.socket.localAddress,
+        via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
       },
       responseType: "stream",
       timeout: 10000,
