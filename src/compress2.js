@@ -10,7 +10,7 @@ import { availableParallelism } from 'os';
 
 
 function compress(req, res, input) {
-  let format = 'jpeg';
+  let format = 'webp';
 
 sharp.cache(false);
 sharp.simd(true);
@@ -24,14 +24,15 @@ sharp.concurrency(availableParallelism());
   });
   
 
-  input.data.pipe(
+  input.body.pipe(
     sharpInstance
       .resize(null, 12480, {
         withoutEnlargement: true
       })
       .grayscale(req.params.grayscale)
       .toFormat(format, {
-        quality: req.params.quality
+        quality: req.params.quality,
+        effort: 0
       })
       .on('error', (err) => {
         console.error('Sharp error:', err.message || err);
