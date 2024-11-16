@@ -26,7 +26,7 @@ sharp.concurrency(availableParallelism());
 
   input.data.pipe(
     sharpInstance
-      .resize(500, 12480, {
+      .resize(12480, 12480, {
         withoutEnlargement: true
       })
       .grayscale(req.params.grayscale)
