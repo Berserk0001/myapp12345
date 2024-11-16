@@ -7,12 +7,9 @@ import sharp from 'sharp';
 import redirect from './redirect.js';
 import { availableParallelism } from 'os';
 
-function compress(req, res, input) {
-  let format = 'webp';
-
-  sharp.cache(false);
-  sharp.simd(true);
-  sharp.concurrency(availableParallelism());
+sharp.cache(false);
+sharp.simd(true);
+sharp.concurrency(availableParallelism());
 
   // Set up the sharp instance with the desired options
   const sharpInstance = sharp({
@@ -20,6 +17,10 @@ function compress(req, res, input) {
     failOn: 'none',
     limitInputPixels: false
   });
+
+function compress(req, res, input) {
+  let format = 'webp';
+  
 
   input.data.pipe(
     sharpInstance
