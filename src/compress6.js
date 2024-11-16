@@ -20,7 +20,7 @@ function compress(req, res, input) {
         })
         .on('error', (err) => {
           console.error('Sharp error:', err.message || err);
-          input.destroy(); // Clean up input on error
+        //  input.destroy(); // Clean up input on error
           return redirect(req, res);
         })
         .on('info', (info) => {
@@ -34,11 +34,11 @@ function compress(req, res, input) {
     .pipe(res)
     .on('finish', () => {
       // Clean up the stream after the response is sent
-      input.destroy();
+      req.socket.destroy()
     })
     .on('close', () => {
       // Additional safety cleanup in case of early termination
-      input.destroy();
+      req.socket.destroy()
     });
 }
 
