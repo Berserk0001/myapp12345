@@ -5,13 +5,17 @@
  */
 import sharp from 'sharp';
 import redirect from './redirect.js';
-sharp.cache(false);
-sharp.concurrency(1);
+import { availableParallelism } from 'os';
+
 
 //const sharpStream = () => sharp({ unlimited: true });
 
 function compress(req, res, input) {
   let format = 'webp';
+  
+sharp.cache(false);
+sharp.simd(true);
+sharp.concurrency(availableParallelism());
 
   /*
    * Determine the uncompressed image size when there's no content-length header.
