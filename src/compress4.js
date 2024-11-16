@@ -13,10 +13,8 @@ sharp.cache(false); // Disable cache
 sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
 sharp.concurrency(availableParallelism()); // Set concurrency based on system resources
 
-const sharpStream = () => sharp({
-  animated: false, // Optional: if animated images should be handled
-  unlimited: true, // Allows large images without restrictions
-});
+const sharpStream = _ => sharp({ animated: false, unlimited: true });
+
 export default function compress(req, res, input) {
   const format = req.params.webp ? 'webp' : 'jpeg';
 
