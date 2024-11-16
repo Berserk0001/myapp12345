@@ -16,7 +16,7 @@ export default function compress(req, res, input) {
   // Configure sharp settings
 sharp.cache(false); // Disable cache
 sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
-sharp.concurrency(availableParallelism()); // Set concurrency based on system resources
+sharp.concurrency(0); // Set concurrency based on system resources
   
 const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
