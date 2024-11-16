@@ -25,8 +25,7 @@ export default function compress(req, res, input) {
       .grayscale(req.params.grayscale)
       .toFormat(format, {
         quality: req.params.quality,
-        progressive: true,
-        optimizeScans: true,
+        effort: 0
       })
   )
     .on('info', info => {
