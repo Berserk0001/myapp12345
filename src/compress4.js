@@ -5,19 +5,26 @@
  * compress(httpRequest, httpResponse, ReadableStream);
  */
 import sharp from 'sharp';
+import { availableParallelism } from 'os'; // Import availableParallelism from os
 import redirect from './redirect.js';
+
+// Configure sharp settings
+sharp.cache(false); // Disable cache
+sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
+sharp.concurrency(availableParallelism()); // Set concurrency based on system resources
 
 const sharpStream = () => sharp({ animated: false, unlimited: true });
 
-function compress(req, res, input) {
-  const format = 'webp';
+export default function compress(req, res, input) {
+  const format = req.params.webp ? 'webp' : 'jpeg';
 
   input.data.pipe(
     sharpStream()
       .grayscale(req.params.grayscale)
       .toFormat(format, {
         quality: req.params.quality,
-        effort: 0
+        progressive: true,
+        optimizeScans: true,
       })
   )
     .on('info', info => {
@@ -33,4 +40,3 @@ function compress(req, res, input) {
     .on('error', () => redirect(req, res)) // Redirect if an error occurs
     .pipe(res); // Directly pipe the output to the response
 }
-export default compress;
