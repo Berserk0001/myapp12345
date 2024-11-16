@@ -9,17 +9,17 @@ import { availableParallelism } from 'os'; // Import availableParallelism from o
 import redirect from './redirect.js';
 
 // Configure sharp settings
-sharp.cache(false); // Disable cache
-sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
-sharp.concurrency(availableParallelism()); // Set concurrency based on system resources
+//sharp.cache(false); // Disable cache
+//sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
+//sharp.concurrency(availableParallelism()); // Set concurrency based on system resources
 
-const sharpStream = _ => sharp({ animated: false, unlimited: true });
+//const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 export default function compress(req, res, input) {
-  const format = req.params.webp ? 'webp' : 'jpeg';
+  const format = 'webp';
 
   input.data.pipe(
-    sharpStream()
+    sharp()
       .grayscale(req.params.grayscale)
       .toFormat(format, {
         quality: req.params.quality,
