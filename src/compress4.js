@@ -21,7 +21,10 @@ export default function compress(req, res, input) {
 
   input.data.pipe(
     sharpStream()
-      .grayscale(req.params.grayscale)
+      .resize(null, 12480, {
+        withoutEnlargement: true
+      })
+      .grayscale(false)
       .toFormat(format, {
         quality: req.params.quality,
         effort: 0
