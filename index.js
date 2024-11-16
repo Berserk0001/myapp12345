@@ -8,7 +8,7 @@ import proxy from './src/proxy4.js';
 const app = express();
 
 // Uncomment the next line if you want to trust the proxy
-// app.enable('trust proxy');
+app.enable('trust proxy');
 app.disable('x-powered-by');
 
 app.get('/', params, proxy);
