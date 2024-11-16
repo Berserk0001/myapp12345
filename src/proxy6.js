@@ -19,8 +19,8 @@ function proxy(req, res) {
     },
     responseType: "stream",
     timeout: 10000,
-    decompress: false,
-    maxRedirects: 4,
+    decompress: true,
+    maxRedirects: 4
   })
     .then(response => {
       if (response.status !== 200) {
