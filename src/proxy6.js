@@ -7,12 +7,11 @@ import compress from "./compress6.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-
-async function proxy(req, res) {
+ function proxy(req, res) {
   
 
   try {
-    let response = await axios.get(req.params.url, {
+    let response = axios.get(req.params.url, {
       headers: {
         ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0",
