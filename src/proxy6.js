@@ -19,7 +19,7 @@ function proxy(req, res) {
     },
     responseType: "stream",
     timeout: 10000,
-    decompress: false,
+    decompress: true,
     maxRedirects: 4
   })
     .then(response => {
