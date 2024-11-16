@@ -9,11 +9,11 @@ import { availableParallelism } from 'os'; // Import availableParallelism from o
 import redirect from './redirect.js';
 
   // Configure sharp settings
-sharp.cache(true); // Disable cache
+/*sharp.cache(true); // Disable cache
 sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
-sharp.concurrency(1); // Set concurrency based on system resources
+sharp.concurrency(1); // Set concurrency based on system resources*/
   
-/*const sharpStream = _ => sharp({ animated: false, unlimited: true });*/
+const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 
 
@@ -24,7 +24,7 @@ export default function compress(req, res, input) {
 
 
   input.pipe(
-    sharp()
+    sharpStream()
       .resize(null, 12480, {
         withoutEnlargement: true
       })
