@@ -5,7 +5,7 @@
  */
 import sharp from 'sharp';
 import redirect from './redirect.js';
-import { availableParallelism } from 'os';
+//import { availableParallelism } from 'os';
 
 
 
@@ -14,7 +14,7 @@ function compress(req, res, input) {
 
 sharp.cache(false);
 sharp.simd(true);
-sharp.concurrency(availableParallelism());
+sharp.concurrency(0);
 
   // Set up the sharp instance with the desired options
   const sharpInstance = sharp({
