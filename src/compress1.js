@@ -10,7 +10,7 @@ import { availableParallelism } from 'os';
 
 
 function compress(req, res, input) {
-  let format = 'webp';
+  let format = 'jpeg';
 
 sharp.cache(false);
 sharp.simd(true);
