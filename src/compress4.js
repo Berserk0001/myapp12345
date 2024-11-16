@@ -15,7 +15,7 @@ import redirect from './redirect.js';
 
 
 export default function compress(req, res, input) {
-  const format = 'webp';
+  const format = 'jpeg';
   const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 
