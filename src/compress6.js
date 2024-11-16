@@ -34,11 +34,11 @@ function compress(req, res, input) {
     .pipe(res)
     .on('finish', () => {
       // Clean up the stream after the response is sent
-      req.socket.destroy()
+      input.destroy()
     })
     .on('close', () => {
       // Additional safety cleanup in case of early termination
-      req.socket.destroy()
+      input.destroy()
     });
 }
 
