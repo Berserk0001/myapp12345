@@ -54,7 +54,7 @@ async function proxy(req, res) {
       return response.data.pipe(res);
     }
     }
-  } catch (err) {
+   catch (err) {
   //  console.error("Proxy error:", err.message || err);
     redirect(req, res);
   }
