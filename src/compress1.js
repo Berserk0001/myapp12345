@@ -22,7 +22,7 @@ sharp.concurrency(0);
   });
   
 
-  input.data.pipe(
+  input.pipe(
     sharpInstance
       .resize(null, 12480, {
         withoutEnlargement: true
