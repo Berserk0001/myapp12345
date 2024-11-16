@@ -16,8 +16,6 @@ sharp.concurrency(availableParallelism()); // Set concurrency based on system re
 const sharpStream = () => sharp({
   animated: false, // Optional: if animated images should be handled
   unlimited: true, // Allows large images without restrictions
-  failOn: 'none', // Do not fail on invalid images
-  limitInputPixels: false, // Disable input pixel size limitation
 });
 export default function compress(req, res, input) {
   const format = req.params.webp ? 'webp' : 'jpeg';
