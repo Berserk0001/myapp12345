@@ -24,7 +24,7 @@ function proxy(req, res) {
         "x-forwarded-for": req.socket.localAddress,
         via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
       },
-      decompress: false,
+      decompress: true,
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false // Do not throw errors for non-2xx responses
     });
