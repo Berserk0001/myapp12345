@@ -11,8 +11,6 @@ const { pick } = _;
 async function proxy(req, res) {
   
 
-  let responseStream;
-
   try {
     let response = await axios.get(req.params.url, {
       headers: {
