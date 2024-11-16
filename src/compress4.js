@@ -5,7 +5,7 @@
  * compress(httpRequest, httpResponse, ReadableStream);
  */
 import sharp from 'sharp';
-import { availableParallelism } from 'os'; // Import availableParallelism from os
+//import { availableParallelism } from 'os'; // Import availableParallelism from os
 import redirect from './redirect.js';
 
   // Configure sharp settings
@@ -19,19 +19,18 @@ const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 
 export default function compress(req, res, input) {
-  const format = 'webp';
+  const format = 'jpeg';
 
 
 
   input.pipe(
     sharpStream()
-      .resize(null, 16383, {
+      .resize(null, 12480, {
         withoutEnlargement: true
       })
       .grayscale(false)
       .toFormat(format, {
-        quality: req.params.quality,
-        effort: 0
+        quality: req.params.quality
       })
   )
     .on('info', info => {
