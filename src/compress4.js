@@ -8,11 +8,6 @@ import sharp from 'sharp';
 import { availableParallelism } from 'os'; // Import availableParallelism from os
 import redirect from './redirect.js';
 
-
-
-
-export default function compress(req, res, input) {
-  const format = 'webp';
   // Configure sharp settings
 sharp.cache(false); // Disable cache
 sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
@@ -21,7 +16,14 @@ sharp.concurrency(0); // Set concurrency based on system resources
 const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 
-  input.data.pipe(
+
+
+export default function compress(req, res, input) {
+  const format = 'webp';
+
+
+
+  input.pipe(
     sharpStream()
       .resize(null, 12480, {
         withoutEnlargement: true
@@ -38,9 +40,6 @@ const sharpStream = _ => sharp({ animated: false, unlimited: true });
       res.setHeader('content-length', info.size);
       res.setHeader('x-original-size', req.params.originSize);
       res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-      
-      // Set HTTP status code (200 OK) after setting headers
-      res.status(200);
     })
     .on('error', () => redirect(req, res)) // Redirect if an error occurs
     .pipe(res); // Directly pipe the output to the response
