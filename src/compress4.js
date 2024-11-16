@@ -12,7 +12,7 @@ const sharpStream = () => sharp({ animated: false, unlimited: true });
 function compress(req, res, input) {
   const format = 'webp';
 
-  input.pipe(
+  input.data.pipe(
     sharpStream()
       .grayscale(req.params.grayscale)
       .toFormat(format, {
