@@ -3,7 +3,7 @@ import axios from "axios";
 import { randomDesktopUA } from './ua.js';
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
-import compress from "./compress6.js";
+import compress from "./compress1.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
