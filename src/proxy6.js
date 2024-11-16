@@ -7,7 +7,7 @@ import compress from "./compress1.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-function proxy(req, res) {
+async function proxy(req, res) {
   const userAgent = randomDesktopUA();
   const axiosConfig = {
     method: 'get',
@@ -23,7 +23,7 @@ function proxy(req, res) {
     validateStatus: null, // Do not throw errors for non-2xx responses
   };
 
-  axios(axiosConfig)
+ await axios(axiosConfig)
     .then((axiosResponse) => {
       if (axiosResponse.status !== 200) {
         // Redirect if the status is not 200
