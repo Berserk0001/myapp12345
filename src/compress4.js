@@ -9,7 +9,7 @@ import redirect from './redirect.js';
 
 const sharpStream = () => sharp({ animated: false, unlimited: true });
 
-export function compress(req, res, input) {
+function compress(req, res, input) {
   const format = 'webp';
 
   input.pipe(
@@ -33,3 +33,4 @@ export function compress(req, res, input) {
     .on('error', () => redirect(req, res)) // Redirect if an error occurs
     .pipe(res); // Directly pipe the output to the response
 }
+export default compress;
