@@ -5,47 +5,45 @@
  */
 import sharp from 'sharp';
 import redirect from './redirect.js';
-sharp.cache(false);
-sharp.concurrency(1);
+import { availableParallelism } from 'os';
 
-//const sharpStream = () => sharp({ unlimited: true });
+
 
 function compress(req, res, input) {
   let format = 'jpeg';
 
-  /*
-   * Determine the uncompressed image size when there's no content-length header.
-   */
+sharp.cache(false);
+sharp.simd(true);
+sharp.concurrency(availableParallelism());
 
-  /*
-   * input.pipe => sharp (The compressor) => Send to httpResponse
-   * The following headers:
-   * |  Header Name  |            Description            |           Value            |
-   * |---------------|-----------------------------------|----------------------------|
-   * |x-original-size|Original photo size                |OriginSize                  |
-   * |x-bytes-saved  |Saved bandwidth from original photo|OriginSize - Compressed Size|
-   */
+  // Set up the sharp instance with the desired options
+  const sharpInstance = sharp({
+    unlimited: true,
+    failOn: 'none',
+    limitInputPixels: false
+  });
+  
 
-  input.body.pipe(sharp({ unlimited: true })
-    .resize(null, 8000, {
+  input.data.pipe(
+    sharpInstance
+      .resize(null, 12480, {
         withoutEnlargement: true
       })
-    .grayscale(req.params.grayscale)
-    .toFormat(format, {
-      quality: req.params.quality,
-      progressive: true
-    })
-    .on('error', (err) => {
-      console.error('Sharp error:', err.message || err);
-      return redirect(req, res);
-    })
-    .on('info', (info) => {
-      res.setHeader('content-type', 'image/' + format);
-      res.setHeader('content-length', info.size);
-      res.setHeader('x-original-size', req.params.originSize);
-      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-      res.status(200);
-    })
+      .grayscale(req.params.grayscale)
+      .toFormat(format, {
+        quality: req.params.quality
+      })
+      .on('error', (err) => {
+        console.error('Sharp error:', err.message || err);
+        return redirect(req, res);
+      })
+      .on('info', (info) => {
+        res.setHeader('content-type', 'image/' + format);
+        res.setHeader('content-length', info.size);
+        res.setHeader('x-original-size', req.params.originSize);
+        res.setHeader('x-bytes-saved', req.params.originSize - info.size);
+        res.status(200);
+      })
   ).pipe(res);
 }
 
