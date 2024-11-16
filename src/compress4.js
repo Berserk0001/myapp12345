@@ -19,7 +19,7 @@ export default function compress(req, res, input) {
   const format = 'webp';
 
   input.data.pipe(
-    sharpStream
+    sharpStream()
       .grayscale(req.params.grayscale)
       .toFormat(format, {
         quality: req.params.quality,
