@@ -18,9 +18,7 @@ sharp.concurrency(0);
 
   // Set up the sharp instance with the desired options
   const sharpInstance = sharp({
-    unlimited: true,
-    failOn: 'none',
-    limitInputPixels: false
+    unlimited: true
   });
   
 
@@ -31,7 +29,14 @@ sharp.concurrency(0);
       })
       .grayscale(req.params.grayscale)
       .toFormat(format, {
-        quality: req.params.quality
+        quality: req.params.quality,
+        progressive: true, // Enable progressive JPEG
+      chromaSubsampling: '4:2:0', // Default chroma subsampling
+      optimiseCoding: true, // Optimise Huffman coding tables
+      trellisQuantisation: false, // Disable trellis quantisation to reduce CPU usage
+      overshootDeringing: false, // Disable overshoot deringing to reduce CPU usage
+      optimiseScans: false, // Disable optimisation of progressive scans to reduce CPU usage
+      quantisationTable: 0
       })
       .on('error', (err) => {
         console.error('Sharp error:', err.message || err);
