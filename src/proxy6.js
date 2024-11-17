@@ -7,10 +7,10 @@ import compress from "./compress4.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-function proxy(req, res) {
+async function proxy(req, res) {
   let userAgent = randomDesktopUA();
 
-  axios.get(req.params.url, {
+  await axios.get(req.params.url, {
     headers: {
       ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
       "user-agent": userAgent,
