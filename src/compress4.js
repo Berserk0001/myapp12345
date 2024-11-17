@@ -15,7 +15,7 @@ sharp.concurrency(1); // Set concurrency based on system resources*/
   
 const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
-
+sharp.simd(true);
 
 
 export default function compress(req, res, input) {
