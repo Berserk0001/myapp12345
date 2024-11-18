@@ -8,18 +8,20 @@ import sharp from 'sharp';
 import { availableParallelism } from 'os'; // Import availableParallelism from os
 import redirect from './redirect.js';
 
-  // Configure sharp settings
-sharp.cache(false); // Disable cache
-sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
-sharp.concurrency(0); // Set concurrency based on system resources
   
-const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 //sharp.simd(true);
 
 
 export default function compress(req, res, input) {
   const format = 'webp';
+
+  // Configure sharp settings
+sharp.cache(false); // Disable cache
+sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
+sharp.concurrency(0); // Set concurrency based on system resources
+  
+const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 
 
