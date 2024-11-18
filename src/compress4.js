@@ -13,22 +13,23 @@ import redirect from './redirect.js';
 sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
 sharp.concurrency(1); // Set concurrency based on system resources*/
   
-const sharpStream = _ => sharp({ animated: false, unlimited: true });
+//const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 //sharp.simd(true);
 
 
 export default function compress(req, res, input) {
-  const format = 'jpeg';
+  const format = 'webp';
 
 
 
   input.pipe(
-    sharpStream()
+    sharp()
       .resize(null, 12480)
       .grayscale(false)
       .toFormat(format, {
-        quality: req.params.quality
+        quality: req.params.quality,
+        effort: 0,
       })
   )
     .on('info', info => {
