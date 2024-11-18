@@ -30,7 +30,7 @@ function proxy(req, res) {
     });
 
     // Handle the response before streaming
-    responseStream.once('response', (httpResponse) => {
+    responseStream.on('response', (httpResponse) => {
       if (httpResponse.statusCode !== 200) {
         // Redirect if the status is not 200
         return redirect(req, res);
