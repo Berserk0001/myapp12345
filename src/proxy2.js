@@ -22,9 +22,9 @@ function proxy(req, res) {
         ...pick(req.headers, ["dnt"]),
         "user-agent": userAgent,
         "x-forwarded-for": req.socket.localAddress,
-        via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
+        via: "1.1 myapp-hero",
       },
-      decompress: true,
+      decompress: false,
       maxRedirects: 4, // Handles redirections
       throwHttpErrors: false // Do not throw errors for non-2xx responses
     });
