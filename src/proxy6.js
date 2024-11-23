@@ -37,7 +37,7 @@ const { pick } = _;
       response.data.on('error', () => req.socket.destroy());
 
       if (shouldCompress(req)) {
-         compress(req, res, response);
+        return compress(req, res, response);
       } else {
         // Bypass compression
         res.setHeader("x-proxy-bypass", 1);
@@ -47,13 +47,13 @@ const { pick } = _;
           if (headerName in response.headers) res.setHeader(headerName, response.headers[headerName]);
         }
 
-        response.data.pipe(res);
+        return response.data.pipe(res);
       }
     })
     .catch(err => {
       // Log error if needed, otherwise redirect on failure
       console.error("Proxy error:", err.message || err);
-      redirect(req, res);
+     return redirect(req, res);
     });
 }
 
