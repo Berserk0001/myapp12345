@@ -25,7 +25,7 @@ const { pick } = _;
     .then(response => {
       if (response.status !== 200) {
         // If the status is not 200, handle the redirect
-        return redirect(req, res);
+        redirect(req, res);
       }
 
       copyHeaders(response, res);
@@ -37,7 +37,7 @@ const { pick } = _;
       response.data.on('error', () => req.socket.destroy());
 
       if (shouldCompress(req)) {
-        return compress(req, res, response);
+         compress(req, res, response);
       } else {
         // Bypass compression
         res.setHeader("x-proxy-bypass", 1);
@@ -47,13 +47,13 @@ const { pick } = _;
           if (headerName in response.headers) res.setHeader(headerName, response.headers[headerName]);
         }
 
-        return response.data.pipe(res);
+         response.data.pipe(res);
       }
     })
     .catch(err => {
       // Log error if needed, otherwise redirect on failure
       console.error("Proxy error:", err.message || err);
-     return redirect(req, res);
+      redirect(req, res);
     });
 }
 
