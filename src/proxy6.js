@@ -7,19 +7,19 @@ import compress from "./compress4.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-async function proxy(req, res) {
+ function proxy(req, res) {
   let userAgent = randomDesktopUA();
 
-  await axios.get(req.params.url, {
+   axios.get(req.params.url, {
     headers: {
       ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
       "user-agent": userAgent,
       "x-forwarded-for": req.socket.localAddress,
-      via: "1.1 2e9b3ee4d534903f433e1ed8ea30e57a.cloudfront.net (CloudFront)",
+      via: "1.1 myhero-app",
     },
     responseType: "stream",
     timeout: 10000,
-    decompress: true,
+    decompress: false,
     maxRedirects: 4
   })
     .then(response => {
@@ -37,7 +37,7 @@ async function proxy(req, res) {
       response.data.on('error', () => req.socket.destroy());
 
       if (shouldCompress(req)) {
-        return compress(req, res, response);
+         compress(req, res, response);
       } else {
         // Bypass compression
         res.setHeader("x-proxy-bypass", 1);
@@ -47,7 +47,7 @@ async function proxy(req, res) {
           if (headerName in response.headers) res.setHeader(headerName, response.headers[headerName]);
         }
 
-        return response.data.pipe(res);
+        response.data.pipe(res);
       }
     })
     .catch(err => {
