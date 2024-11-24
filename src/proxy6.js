@@ -1,60 +1,72 @@
+"use strict";
+/*
+ * proxy.js
+ * The bandwidth hero proxy handler.
+ * proxy(httpRequest, httpResponse);
+ */
 import _ from "lodash";
 import axios from "axios";
-import { randomDesktopUA } from './ua.js';
+import { randomDesktopUA } from './ua.js'
 import shouldCompress from "./shouldCompress.js";
 import redirect from "./redirect.js";
 import compress from "./compress4.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
- function proxy(req, res) {
-  let userAgent = randomDesktopUA();
+function proxy(req, res) {
+  try {
+    // Fetch the image using Axios
+    let userAgent = randomDesktopUA();
 
-   axios.get(req.params.url, {
-    headers: {
-      ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
-      "user-agent": userAgent,
-      "x-forwarded-for": req.socket.localAddress,
-      via: "1.1 myhero-app",
-    },
-    responseType: "stream",
-    timeout: 10000,
-    decompress: false,
-    maxRedirects: 4
-  })
-    .then(response => {
-      if (response.status !== 200) {
-        // If the status is not 200, handle the redirect
-        redirect(req, res);
+    axios({
+      method: 'get',
+      url: req.params.url,
+      responseType: 'stream', // Axios will handle the response as a stream
+      headers: {
+        ...pick(req.headers, ["dnt"]),
+        "user-agent": userAgent,
+        "x-forwarded-for": req.socket.localAddress,
+        via: "1.1 myapp-hero",
+      },
+      maxRedirects: 4, // Handles redirections
+      validateStatus: () => true, // Accept all HTTP status codes without throwing errors
+    })
+    .then((axiosResponse) => {
+      if (axiosResponse.status !== 200) {
+        // Redirect if the status is not 200
+        return redirect(req, res);
       }
 
-      copyHeaders(response, res);
-      res.setHeader("content-encoding", "identity");
-      req.params.originType = response.headers["content-type"] || "";
-      req.params.originSize = parseInt(response.headers["content-length"], 10) || 0;
+      // Set originType and originSize parameters
+      req.params.originType = axiosResponse.headers['content-type'] || '';
+      req.params.originSize = axiosResponse.headers['content-length'] || 0;
 
-      // Handle streaming response
-      response.data.on('error', () => req.socket.destroy());
+      // Copy headers and set necessary response headers
+      copyHeaders(axiosResponse.headers, res);
+      res.setHeader('content-encoding', 'identity');
 
-      if (shouldCompress(req)) {
-         compress(req, res, response);
-      } else {
-        // Bypass compression
+      // Bypass compression if the response is not an image or should not be compressed
+      if (!req.params.originType.startsWith('image') || !shouldCompress(req)) {
         res.setHeader("x-proxy-bypass", 1);
-
-        // Set specific headers
+        // Set specific headers for bypassed content
         for (const headerName of ["accept-ranges", "content-type", "content-length", "content-range"]) {
-          if (headerName in response.headers) res.setHeader(headerName, response.headers[headerName]);
+          if (headerName in axiosResponse.headers) res.setHeader(headerName, axiosResponse.headers[headerName]);
         }
-
-         response.data.pipe(res);
+        axiosResponse.data.pipe(res); // Pipe non-compressed response directly
+      } else {
+        compress(req, res, axiosResponse.data); // Send stream to compression
       }
     })
-    .catch(err => {
-      // Log error if needed, otherwise redirect on failure
-      console.error("Proxy error:", err.message || err);
+    .catch((error) => {
+      console.error('Proxy error:', error.message || error);
+      // Redirect if an error occurs
       redirect(req, res);
     });
+  } catch (err) {
+    console.error('Proxy error:', err.message || err);
+    // Redirect if an error occurs in the try-catch
+    redirect(req, res);
+  }
 }
 
 export default proxy;
