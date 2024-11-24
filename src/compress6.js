@@ -5,8 +5,8 @@
  * compress(httpRequest, httpResponse, ReadableStream);
  */
 import sharp from 'sharp';
-import { availableParallelism } from 'os'; // Import availableParallelism from os
-//import redirect from './redirect.js';
+//import { availableParallelism } from 'os'; // Import availableParallelism from os
+import redirect from './redirect.js';
 
   
 
