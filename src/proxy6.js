@@ -18,8 +18,8 @@ function proxy(req, res) {
     // Fetch the image using Axios
     let userAgent = randomDesktopUA();
 
-    axios({
-      method: 'get',
+    axios.get({
+     // method: 'get',
       url: req.params.url,
       responseType: 'stream', // Axios will handle the response as a stream
       headers: {
