@@ -25,7 +25,7 @@ const sharpStream = _ => sharp({ animated: false, unlimited: true });
 
 
 
-  input.data.pipe(
+  input.pipe(
     sharpStream()
       .resize(null, 12480, {
         withoutEnlargement: true
