@@ -13,60 +13,81 @@ import compress from "./compress6.js";
 import copyHeaders from "./copyHeaders.js";
 const { pick } = _;
 
-function proxy(req, res) {
+async function proxy(req, res) {
+  /*
+   * Avoid loopback that could causing server hang.
+   */
+  if (
+    req.headers["via"] == "1.1 bandwidth-hero" &&
+    ["127.0.0.1", "::1"].includes(req.headers["x-forwarded-for"] || req.ip)
+  )
+    return redirect(req, res);
   try {
-    // Fetch the image using Axios
-    let userAgent = randomDesktopUA();
-
-    axios.get({
-     // method: 'get',
-      url: req.params.url,
-      responseType: 'stream', // Axios will handle the response as a stream
+    let origin = await axios.get(req.params.url, {
       headers: {
-        ...pick(req.headers, ["dnt"]),
-        "user-agent": userAgent,
-        "x-forwarded-for": req.socket.localAddress,
-        via: "1.1 myapp-hero",
+        ...pick(req.headers, ["cookie", "dnt", "referer", "range"]),
+        "user-agent": "Bandwidth-Hero Compressor",
+        "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
+        via: "1.1 bandwidth-hero",
       },
-      maxRedirects: 4, // Handles redirections
-    //  validateStatus: () => true, // Accept all HTTP status codes without throwing errors
-    })
-    .then((axiosResponse) => {
-      if (axiosResponse.status !== 200) {
-        // Redirect if the status is not 200
-        return redirect(req, res);
-      }
-
-      // Set originType and originSize parameters
-      req.params.originType = axiosResponse.headers['content-type'] || '';
-      req.params.originSize = axiosResponse.headers['content-length'] || 0;
-
-      // Copy headers and set necessary response headers
-      copyHeaders(axiosResponse.headers, res);
-      res.setHeader('content-encoding', 'identity');
-
-      // Bypass compression if the response is not an image or should not be compressed
-      if (!req.params.originType.startsWith('image') || !shouldCompress(req)) {
-        res.setHeader("x-proxy-bypass", 1);
-        // Set specific headers for bypassed content
-        for (const headerName of ["accept-ranges", "content-type", "content-length", "content-range"]) {
-          if (headerName in axiosResponse.headers) res.setHeader(headerName, axiosResponse.headers[headerName]);
-        }
-        axiosResponse.data.pipe(res); // Pipe non-compressed response directly
-      } else {
-        compress(req, res, axiosResponse); // Send stream to compression
-      }
-    })
-    .catch((error) => {
-      console.error('Proxy error:', error.message || error);
-      // Redirect if an error occurs
-      redirect(req, res);
+      maxRedirections: 4
     });
+    _onRequestResponse(origin, req, res);
   } catch (err) {
-    console.error('Proxy error:', err.message || err);
-    // Redirect if an error occurs in the try-catch
-    redirect(req, res);
+    _onRequestError(req, res, err);
   }
 }
+
+function _onRequestError(req, res, err) {
+  // Ignore invalid URL.
+  if (err.code === "ERR_INVALID_URL") return res.status(400).send("Invalid URL");
+
+  /*
+   * When there's a real error, Redirect then destroy the stream immediately.
+   */
+  redirect(req, res);
+  console.error(err);
+}
+
+function _onRequestResponse(origin, req, res) {
+  if (origin.statusCode >= 400)
+    return redirect(req, res);
+
+  // handle redirects
+  if (origin.statusCode >= 300 && origin.headers.location)
+    return redirect(req, res);
+
+  copyHeaders(origin, res);
+  res.setHeader("content-encoding", "identity");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
+  req.params.originType = origin.headers["content-type"] || "";
+  req.params.originSize = origin.headers["content-length"] || "0";
+
+  origin.data.on('error', _ => req.socket.destroy());
+
+  if (shouldCompress(req)) {
+    /*
+     * sharp support stream. So pipe it.
+     */
+    return compress(req, res, origin);
+  } else {
+    /*
+     * Downloading then uploading the buffer to the client is not a good idea though,
+     * It would better if you pipe the incomming buffer to client directly.
+     */
+
+    res.setHeader("x-proxy-bypass", 1);
+
+    for (const headerName of ["accept-ranges", "content-type", "content-length", "content-range"]) {
+      if (headerName in origin.headers)
+        res.setHeader(headerName, origin.headers[headerName]);
+    }
+
+    return origin.data.pipe(res);
+  }
+}
+
 
 export default proxy;
