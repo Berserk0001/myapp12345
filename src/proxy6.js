@@ -54,7 +54,7 @@ function proxy(req, res) {
         }
         axiosResponse.data.pipe(res); // Pipe non-compressed response directly
       } else {
-        compress(req, res, axiosResponse.data); // Send stream to compression
+        compress(req, res, axiosResponse); // Send stream to compression
       }
     })
     .catch((error) => {
