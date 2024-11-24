@@ -14,7 +14,7 @@ import redirect from './redirect.js';
 
 
 export default function compress(req, res, input) {
-  const format = 'webp';
+  const format = 'jpeg';
 
   // Configure sharp settings
 sharp.cache(false); // Disable cache
@@ -33,7 +33,13 @@ const sharpStream = _ => sharp({ animated: false, unlimited: true });
       .grayscale(false)
       .toFormat(format, {
         quality: req.params.quality,
-        effort: 0
+        progressive: true, // Enable progressive JPEG
+      chromaSubsampling: '4:2:0', // Default chroma subsampling
+      optimiseCoding: true, // Optimise Huffman coding tables
+      trellisQuantisation: false, // Disable trellis quantisation to reduce CPU usage
+      overshootDeringing: false, // Disable overshoot deringing to reduce CPU usage
+      optimiseScans: false, // Disable optimisation of progressive scans to reduce CPU usage
+      quantisationTable: 0
       })
   )
     .on('info', info => {
