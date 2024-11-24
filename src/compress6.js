@@ -35,7 +35,7 @@ const sharpStream = _ => sharp({ animated: false, unlimited: true });
         quality: req.params.quality,
         progressive: true, // Enable progressive JPEG
       chromaSubsampling: '4:2:0', // Default chroma subsampling
-     /optimiseCoding: true, // Optimise Huffman coding tables
+     optimiseCoding: true, // Optimise Huffman coding tables
       trellisQuantisation: false, // Disable trellis quantisation to reduce CPU usage
       overshootDeringing: false, // Disable overshoot deringing to reduce CPU usage
       optimiseScans: false, // Disable optimisation of progressive scans to reduce CPU usage
