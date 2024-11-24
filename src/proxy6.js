@@ -65,7 +65,7 @@ function _onRequestResponse(origin, req, res) {
   req.params.originType = origin.headers["content-type"] || "";
   req.params.originSize = origin.headers["content-length"] || "0";
 
-  origin.data.on('error', _ => req.socket.destroy());
+//  origin.on('error', _ => req.socket.destroy());
 
   if (shouldCompress(req)) {
     /*
