@@ -29,7 +29,7 @@ function proxy(req, res) {
         via: "1.1 myapp-hero",
       },
       maxRedirects: 4, // Handles redirections
-      validateStatus: () => true, // Accept all HTTP status codes without throwing errors
+    //  validateStatus: () => true, // Accept all HTTP status codes without throwing errors
     })
     .then((axiosResponse) => {
       if (axiosResponse.status !== 200) {
