@@ -30,6 +30,7 @@ async function proxy(req, res) {
         "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
         via: "1.1 bandwidth-hero",
       },
+      responseType: 'stream',
       maxRedirections: 4
     });
     _onRequestResponse(origin, req, res);
@@ -65,7 +66,7 @@ function _onRequestResponse(origin, req, res) {
   req.params.originType = origin.headers["content-type"] || "";
   req.params.originSize = origin.headers["content-length"] || "0";
 
-//  origin.on('error', _ => req.socket.destroy());
+  origin.data.on('error', _ => req.socket.destroy());
 
   if (shouldCompress(req)) {
     /*
