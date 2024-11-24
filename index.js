@@ -3,7 +3,7 @@
 
 import express from 'express';
 import params from './src/params.js';
-import proxy from './src/proxy7.js';
+import proxy from './src/proxy6.js';
 
 const app = express();
 
