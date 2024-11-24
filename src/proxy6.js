@@ -30,7 +30,7 @@ async function proxy(req, res) {
         "x-forwarded-for": req.headers["x-forwarded-for"] || req.ip,
         via: "1.1 bandwidth-hero",
       },
-      decompress: false,
+     // decompress: false,
       responseType: 'stream',
       maxRedirections: 4
     });
