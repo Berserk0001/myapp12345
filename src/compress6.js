@@ -1,45 +1,48 @@
+"use strict";
+/*
+ * compress.js
+ * A module that compresses an image.
+ * compress(httpRequest, httpResponse, ReadableStream);
+ */
 import sharp from 'sharp';
-import redirect from './redirect.js';
+import { availableParallelism } from 'os'; // Import availableParallelism from os
+//import redirect from './redirect.js';
 
-sharp.cache(false);
-sharp.concurrency(1);
+  
 
-function compress(req, res, input) {
-  let format = 'webp';
+//sharp.simd(true);
 
-  input.data
-    .pipe(
-      sharp()
-        .resize(null, 12480, {
-          withoutEnlargement: true,
-        })
-        .grayscale(req.params.grayscale)
-        .toFormat(format, {
-          quality: req.params.quality,
-          effort: 0,
-        })
-        .on('error', (err) => {
-          console.error('Sharp error:', err.message || err);
-        //  input.destroy(); // Clean up input on error
-          return redirect(req, res);
-        })
-        .on('info', (info) => {
-          res.setHeader('content-type', 'image/' + format);
-          res.setHeader('content-length', info.size);
-          res.setHeader('x-original-size', req.params.originSize);
-          res.setHeader('x-bytes-saved', req.params.originSize - info.size);
-          res.status(200);
-        })
-    )
-    .pipe(res)
-    .on('finish', () => {
-      // Clean up the stream after the response is sent
-      input.data.destroy()
+
+export default function compress(req, res, input) {
+  const format = 'webp';
+
+  // Configure sharp settings
+sharp.cache(false); // Disable cache
+sharp.simd(true); // Enable SIMD (Single Instruction, Multiple Data)
+sharp.concurrency(0); // Set concurrency based on system resources
+  
+const sharpStream = _ => sharp({ animated: false, unlimited: true });
+
+
+
+  input.data.pipe(
+    sharpStream()
+      .resize(null, 12480, {
+        withoutEnlargement: true
+      })
+      .grayscale(false)
+      .toFormat(format, {
+        quality: req.params.quality,
+        effort: 0
+      })
+  )
+    .on('info', info => {
+      // Set headers dynamically after compression info is available
+      res.setHeader('content-type', `image/${format}`);
+      res.setHeader('content-length', info.size);
+      res.setHeader('x-original-size', req.params.originSize);
+      res.setHeader('x-bytes-saved', req.params.originSize - info.size);
     })
-    .on('close', () => {
-      // Additional safety cleanup in case of early termination
-      input.data.destroy()
-    });
+    .on('error', () => redirect(req, res)) // Redirect if an error occurs
+    .pipe(res); // Directly pipe the output to the response
 }
-
-export default compress;
