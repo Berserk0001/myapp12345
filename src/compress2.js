@@ -24,7 +24,7 @@ sharp.concurrency(availableParallelism());
   });
   
 
-  input.body.pipe(
+  input.data.pipe(
     sharpInstance
       .resize(null, 16383, {
         withoutEnlargement: true
@@ -35,7 +35,7 @@ sharp.concurrency(availableParallelism());
         effort: 0
       })
       .on('error', (err) => {
-        console.error('Sharp error:', err.message || err);
+        //console.error('Sharp error:', err.message || err);
         return redirect(req, res);
       })
       .on('info', (info) => {
